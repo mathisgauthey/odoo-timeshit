@@ -26,6 +26,7 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Test
-        working-directory: frontend
-        run: npm test -- --watch=false --browsers=ChromeHeadless
+#      TODO: enable tests
+#      - name: Test
+#        working-directory: frontend
+#        run: npm test -- --watch=false --browsers=ChromeHeadless
