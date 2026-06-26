@@ -1,0 +1,61 @@
+{
+  "branches": [
+    "release",
+    {
+      "name": "main",
+      "prerelease": "alpha"
+    }
+  ],
+  "tagFormat": "${version}",
+  "debug": true,
+  "ci": true,
+  "dryRun": false,
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "docs/CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "sed -i \"s|^export const APP_VERSION = .*|export const APP_VERSION = '${nextRelease.version}'|\" src/app/_constants/app-constants.ts && npm run build && (cd dist && zip -r \"../odoo-timeshit-${nextRelease.version}.zip\" odoo-timeshit)"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "docs/CHANGELOG.md",
+          "src/app/_constants/app-constants.ts"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "odoo-timeshit-*.zip",
+            "name": "odoo-timeshit-${nextRelease.version}.zip",
+            "label": "odoo-timeshit ${nextRelease.version} (built Chrome extension)"
+          }
+        ]
+      }
+    ]
+  ]
+}

@@ -1,0 +1,40 @@
+name: Release
+on:
+  push:
+    branches:
+      - main # or master
+
+permissions:
+  contents: read # for checkout
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for trusted publishing and npm provenance
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+      # semantic-release computes the version, then its `prepare` step bumps
+      # APP_VERSION, rebuilds so the artifact carries that version, and zips
+      # dist/odoo-timeshit. The build/test steps above are a pre-release gate.
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx --package semantic-release@25.0.3 --package @semantic-release/commit-analyzer@13.0.1 --package @semantic-release/release-notes-generator@14.1.0 --package conventional-changelog-conventionalcommits@9.1.0 --package @semantic-release/changelog@6.0.3 --package @semantic-release/exec@7.1.0 --package @semantic-release/git@10.0.1 --package @semantic-release/github@12.0.6 semantic-release
