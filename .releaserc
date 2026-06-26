@@ -1,10 +1,6 @@
 {
   "branches": [
-    "release",
-    {
-      "name": "main",
-      "prerelease": "alpha"
-    }
+    "main"
   ],
   "tagFormat": "${version}",
   "debug": true,
