@@ -30,16 +30,16 @@
     }
   ],
   "icons": {
-    "16": "_assets/icons/icon16.png",
-    "48": "_assets/icons/icon48.png",
-    "128": "_assets/icons/icon128.png"
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
   },
   "action": {
     "default_popup": "index.html",
     "default_icon": {
-      "16": "_assets/icons/icon16.png",
-      "48": "_assets/icons/icon48.png",
-      "128": "_assets/icons/icon128.png"
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
     }
   }
 }

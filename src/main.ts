@@ -1,7 +1,7 @@
 import {bootstrapApplication} from '@angular/platform-browser';
 import {appConfig} from './app/app.config';
 import {AppComponent} from './app/app.component';
-import {environment} from './_environments/environment';
+import {environment} from './environments/environment';
 
 
 /**
@@ -19,7 +19,7 @@ import {environment} from './_environments/environment';
  */
 async function bootstrap() {
   if (!environment.production) {
-    const {installChromeShimIfNeeded} = await import('./_environments/chrome-shim');
+    const {installChromeShimIfNeeded} = await import('./environments/chrome-shim');
     installChromeShimIfNeeded();
     await import('./background');
   }
