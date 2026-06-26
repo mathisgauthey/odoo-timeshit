@@ -1,0 +1,83 @@
+@if (loading()) {
+  <div class="flex justify-center items-center py-16">
+    <p-progressSpinner [style]="{ width: '32px', height: '32px' }"
+                       strokeWidth="4"/>
+  </div>
+} @else if (timer()) {
+  <!-- Active timer -->
+  @if (timer(); as t) {
+    <div class="px-3 py-4 flex flex-col gap-4 h-full">
+      <!-- Elapsed display -->
+      <section class="flex flex-col items-center justify-center py-6 rounded-xl border border-[var(--surface-border)] bg-[var(--surface-0)]">
+      <span class="text-xs font-semibold tracking-widest uppercase text-[var(--primary-color)] mb-2">
+        {{ t.paused ? 'Paused' : 'Elapsed Time' }}
+      </span>
+        <div class="text-5xl font-semibold font-mono tabular-nums text-[var(--text-color)]">{{ elapsed() }}</div>
+      </section>
+
+      <!-- Current task -->
+      <section class="flex flex-col gap-2">
+        <h2 class="text-xs font-semibold tracking-wide uppercase text-[var(--text-color-secondary)]">Current Task</h2>
+        <div class="p-4 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-50)] flex items-start gap-3">
+          <div class="w-1 h-10 rounded-full bg-[var(--primary-color)] shrink-0"></div>
+          <div class="overflow-hidden">
+            <h3 class="text-sm font-bold text-[var(--text-color)] truncate">{{ t.name }}</h3>
+            <p class="text-xs text-[var(--text-color-secondary)] truncate">
+              {{ t.projectName || 'No project' }}{{ t.taskName ? ' • ' + t.taskName : '' }}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Controls -->
+      <section class="mt-auto flex flex-col gap-2">
+        @if (t.paused) {
+          <p-button (onClick)="resume()"
+                    [loading]="busy()"
+                    icon="pi pi-play-circle"
+                    label="Resume Timer"
+                    styleClass="w-full justify-center"/>
+        } @else {
+          <p-button (onClick)="pause()"
+                    [loading]="busy()"
+                    icon="pi pi-pause-circle"
+                    label="Pause Timer"
+                    styleClass="w-full justify-center"/>
+        }
+        <p-button (onClick)="stop()"
+                  [loading]="busy()"
+                  [outlined]="true"
+                  icon="pi pi-stop-circle"
+                  label="Stop & Save"
+                  styleClass="w-full justify-center"/>
+      </section>
+    </div>
+  }
+} @else {
+  <!-- No timer running: pick a task to start -->
+  <div class="px-3 py-4 flex flex-col gap-4">
+    <header class="flex flex-col gap-1">
+      <h2 class="text-lg font-semibold text-[var(--text-color)] m-0">Start a Timer</h2>
+      <p class="text-xs italic text-[var(--text-color-secondary)] m-0">Pick one of this week's tasks to track.</p>
+    </header>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">TASK</label>
+      <p-dropdown [(ngModel)]="selected"
+                  [filter]="true"
+                  [options]="entries()"
+                  [showClear]="true"
+                  filterBy="name"
+                  optionLabel="name"
+                  placeholder="Select a task..."
+                  styleClass="w-full"/>
+    </div>
+
+    <p-button (onClick)="start()"
+              [disabled]="!selected"
+              [loading]="busy()"
+              icon="pi pi-play-circle"
+              label="Start Timer"
+              styleClass="w-full justify-center"/>
+  </div>
+}

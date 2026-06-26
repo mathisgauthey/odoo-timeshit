@@ -1,0 +1,51 @@
+info:
+  name: get running timer
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{API}}/account.analytic.line/search_read"
+  headers:
+    - name: X-Odoo-Database
+      value: "{{DATABASE}}"
+      disabled: true
+    - name: Host
+      value: "{{HOST}}"
+    - name: Content-Type
+      value: application/json; charset=utf-8
+    - name: User-Agent
+      value: mysoftware python-requests/2.25.1
+  body:
+    type: json
+    data: |-
+      {
+        "domain": [
+          [
+            "is_timer_running",
+            "=",
+            true
+          ]
+        ],
+        "fields": [
+          "id",
+          "name",
+          "date",
+          "unit_amount",
+          "timer_start",
+          "timer_pause",
+          "is_timer_running",
+          "project_id",
+          "task_id",
+          "employee_id"
+        ]
+      }
+  auth:
+    type: bearer
+    token: "{{API_KEY}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

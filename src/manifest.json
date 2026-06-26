@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Odoo Timesheet Tracker",
+  "version": "1.0.0",
+  "description": "Track timesheets in Odoo directly from your browser. Includes Azure DevOps timer integration.",
+  "permissions": [
+    "storage"
+    // TODO: Remove these apparently ?
+    //    "activeTab",
+    //    "webNavigation",
+    //    "webRequest",
+    //    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "_assets/icons/icon16.png",
+    "48": "_assets/icons/icon48.png",
+    "128": "_assets/icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "_assets/icons/icon16.png",
+      "48": "_assets/icons/icon48.png",
+      "128": "_assets/icons/icon128.png"
+    }
+  }
+}

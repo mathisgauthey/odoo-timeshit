@@ -1,0 +1,47 @@
+info:
+  name: get weekly timesheets
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{API}}/account.analytic.line/search_read"
+  headers:
+    - name: X-Odoo-Database
+      value: "{{DATABASE}}"
+      disabled: true
+    - name: Host
+      value: "{{HOST}}"
+    - name: Content-Type
+      value: application/json; charset=utf-8
+    - name: User-Agent
+      value: mysoftware python-requests/2.25.1
+  body:
+    type: json
+    data: |-
+      {
+        "domain": [
+          ["date", ">=", "2026-06-15"],
+          ["date", "<=", "2026-06-21"]
+        ],
+        "fields": [
+          "id",
+          "name",
+          "date",
+          "unit_amount",
+          "project_id",
+          "task_id",
+          "employee_id",
+          "helpdesk_ticket_id"
+        ],
+        "order": "date desc"
+      }
+  auth:
+    type: bearer
+    token: "{{API_KEY}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

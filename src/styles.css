@@ -1,0 +1,77 @@
+/* Using layers to manage PrimeNG and Tailwind compatibility : https://v17.primeng.org/guides/csslayer#tailwind */
+@import "tailwindcss/base" layer(tailwindcss);
+@import "tailwindcss/components" layer(tailwindcss);
+@import "tailwindcss/utilities" layer(tailwindcss);
+
+@import "primeng/resources/themes/aura-light-purple/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+
+/*Main pop-up style*/
+html, body, app-root {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  width: 800px;
+  height: 600px;
+  overflow: hidden;
+}
+
+/*
+ * Day-balance confirm dialog: the before/after preview is passed as a message
+ * string and rendered via [innerHTML], so Angular's sanitizer strips inline
+ * styles, these global classes carry the layout instead.
+ */
+.balance-intro {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: var(--text-color-secondary);
+}
+
+.balance-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.balance-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-color);
+}
+
+.balance-times {
+  flex-shrink: 0;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  white-space: nowrap;
+}
+
+.balance-before {
+  text-decoration: line-through;
+  opacity: .5;
+}
+
+.balance-after {
+  font-weight: 700;
+}
+
+.balance-after.up {
+  color: var(--primary-color);
+}
+
+.balance-after.down {
+  color: var(--red-500);
+}
+
+.balance-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  font-weight: 700;
+  color: var(--text-color);
+}

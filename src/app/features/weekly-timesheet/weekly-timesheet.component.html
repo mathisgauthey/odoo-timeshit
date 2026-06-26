@@ -1,0 +1,151 @@
+<!-- Week summary & day overview -->
+<section class="p-3 border-b border-[var(--surface-border)] bg-[var(--surface-0)]">
+  <div class="flex justify-between items-end mb-2">
+    <div class="flex items-center gap-2">
+      <button (click)="goToPreviousWeek()"
+              aria-label="Previous week"
+              class="flex items-center justify-center w-7 h-7 rounded-full text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] active:scale-95 transition">
+        <i class="pi pi-chevron-left text-sm"></i>
+      </button>
+      <div>
+        <span class="text-[11px] font-medium uppercase tracking-wider text-[var(--text-color-secondary)]">Current Week</span>
+        <h2 class="text-lg font-semibold text-[var(--text-color)] m-0">{{ weekLabel() }}</h2>
+      </div>
+      <button (click)="goToNextWeek()"
+              aria-label="Next week"
+              class="flex items-center justify-center w-7 h-7 rounded-full text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] active:scale-95 transition">
+        <i class="pi pi-chevron-right text-sm"></i>
+      </button>
+    </div>
+    <div class="text-right">
+      <span class="text-lg font-semibold text-[var(--primary-color)] tabular-nums">{{ formatHoursMinutes(totalHours()) }}</span>
+      <p class="text-[11px] text-[var(--text-color-secondary)] m-0">Target: {{ weeklyTargetHours }}h</p>
+    </div>
+  </div>
+
+  <div class="flex gap-1">
+    @for (bar of dayBars(); track $index) {
+      <div class="flex-1 flex flex-col items-center gap-1">
+        <span [class.font-bold]="bar.isToday"
+              [style.color]="bar.isToday ? 'var(--primary-color)' : 'var(--text-color-secondary)'"
+              class="text-[10px]">{{ bar.letter }}</span>
+        <div [style.backgroundColor]="bar.isWeekend ? 'var(--surface-200)' : 'var(--surface-100)'"
+             [title]="formatHoursMinutes(bar.hours)"
+             class="h-12 w-full rounded-t-lg relative overflow-hidden">
+          <div [style.height.%]="bar.heightPct"
+               class="absolute bottom-0 w-full bg-[var(--primary-color)]"></div>
+        </div>
+        @if (bar.isToday) {
+          <div class="w-1 h-1 rounded-full bg-[var(--primary-color)]"></div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Timesheet entries -->
+@if (loading()) {
+  <div class="flex justify-center items-center py-10">
+    <p-progressSpinner [style]="{ width: '32px', height: '32px' }"
+                       strokeWidth="4"/>
+  </div>
+} @else if (error()) {
+  <div class="flex flex-col items-center gap-3 py-10 px-6 text-center">
+    <i class="pi pi-exclamation-triangle text-2xl text-[var(--text-color-secondary)]"></i>
+    <p class="text-sm text-[var(--text-color-secondary)] m-0">{{ error() }}</p>
+    <button (click)="load()"
+            class="text-sm font-medium text-[var(--primary-color)] hover:underline">Retry
+    </button>
+  </div>
+} @else if (groups().length === 0) {
+  <div class="flex flex-col items-center gap-2 py-10 px-6 text-center">
+    <i class="pi pi-inbox text-2xl text-[var(--text-color-secondary)]"></i>
+    <p class="text-sm text-[var(--text-color-secondary)] m-0">No timesheet entries this week.</p>
+  </div>
+} @else {
+  <section class="flex flex-col pb-4">
+    @for (group of groups(); track group.label) {
+      <div class="sticky top-0 z-10 bg-[var(--surface-50)] px-3 py-2 flex justify-between items-center border-b border-[var(--surface-border)]">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-secondary)]">{{ group.label }}</span>
+          <button (click)="balanceDay(group)"
+                  [disabled]="balancingDate() === group.date"
+                  aria-label="Balance this day to the daily target"
+                  class="flex items-center justify-center w-6 h-6 rounded-full text-[var(--primary-color)] hover:bg-[var(--surface-100)] active:scale-95 disabled:opacity-30 transition"
+                  title="Balance to {{ dailyTargetHours }}h with 5-min steps, weighted by current time">
+            <i [class]="balancingDate() === group.date ? 'pi pi-spinner pi-spin text-[11px]' : 'pi pi-bullseye text-[11px]'"></i>
+          </button>
+        </div>
+        <span [style.color]="group.totalHours >= dailyTargetHours ? 'var(--primary-color)' : 'var(--text-color-secondary)'"
+              class="text-xs font-semibold tabular-nums">{{ formatHoursMinutes(group.totalHours) }}
+          / {{ dailyTargetHours }}h</span>
+      </div>
+
+      @for (entry of group.entries; track entry.id) {
+        <div (click)="edit.emit(entry)"
+             class="w-full text-left p-3 flex gap-2 border-b border-[var(--surface-border)] hover:bg-[var(--surface-50)] active:scale-[0.99] transition-all cursor-pointer">
+          <div class="w-1 h-12 bg-[var(--primary-color)] rounded-full shrink-0"></div>
+          <div class="flex-1 overflow-hidden">
+            <div class="flex justify-between items-start gap-2">
+              <span class="text-sm font-bold text-[var(--text-color)] truncate">{{ entry.name || 'Untitled' }}</span>
+              <div class="flex items-center gap-1.5 shrink-0 group/time">
+                @if (timerSvc.timer()?.lineId !== entry.id) {
+                  <button (click)="$event.stopPropagation(); startTimer(entry)"
+                          [disabled]="timerSvc.busy()"
+                          aria-label="Start timer on this entry"
+                          class="opacity-0 group-hover/time:opacity-100 focus:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 rounded-full text-[var(--primary-color)] hover:bg-[var(--surface-100)] disabled:opacity-30">
+                    <i class="pi pi-play text-[10px]"></i>
+                  </button>
+                }
+                <button (click)="$event.stopPropagation(); confirmDelete(entry)"
+                        [disabled]="deletingId() === entry.id"
+                        aria-label="Delete this entry"
+                        class="opacity-0 group-hover/time:opacity-100 focus:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 rounded-full text-[var(--red-500)] hover:bg-[var(--surface-100)] disabled:opacity-30">
+                  <i class="pi pi-trash text-[10px]"></i>
+                </button>
+                @if (timerSvc.timer()?.lineId === entry.id) {
+                  <!-- Timer running on this entry: live, unsaved elapsed pulsing like a loader. -->
+                  <span (click)="$event.stopPropagation()"
+                        [class.animate-pulse]="!timerSvc.timer()?.paused"
+                        [title]="(timerSvc.timer()?.paused ? 'Timer paused' : 'Timer running') + ' — live, not yet saved'"
+                        class="flex items-center gap-1 px-1 text-sm font-semibold tabular-nums whitespace-nowrap text-[var(--primary-color)]">
+                    <i class="pi pi-circle-fill text-[6px]"></i>
+                    {{ timerSvc.elapsed() }}
+                  </span>
+                } @else {
+                  <input #dur
+                         (blur)="saveDuration(entry, dur.value, dur)"
+                         (click)="$event.stopPropagation()"
+                         (keydown.enter)="$event.stopPropagation(); dur.blur()"
+                         [disabled]="savingDurationId() === entry.id"
+                         [value]="formatHhmm(entry.unit_amount)"
+                         aria-label="Edit logged duration"
+                         class="w-12 px-1 text-sm text-right tabular-nums text-[var(--primary-color)] bg-transparent rounded hover:bg-[var(--surface-100)] focus:bg-[var(--surface-100)] focus:outline-none disabled:opacity-50"
+                         title="Edit duration (1.5, 1:30 or 01:30)"/>
+                }
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 mt-1 overflow-hidden">
+              @if (label(entry.project_id)) {
+                <span class="bg-[var(--surface-100)] text-[var(--text-color-secondary)] px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 truncate max-w-[55%]">{{ label(entry.project_id) }}</span>
+              }
+              @if (label(entry.task_id) || label(entry.helpdesk_ticket_id)) {
+                <span class="text-[11px] italic text-[var(--text-color-secondary)] truncate">{{ label(entry.task_id) || label(entry.helpdesk_ticket_id) }}</span>
+              }
+            </div>
+            @if (customFields().length) {
+              <div class="flex items-center flex-wrap gap-1.5 mt-1 overflow-hidden">
+                @for (field of customFields(); track field.name) {
+                  @if (customLabel(entry, field); as value) {
+                    <span [title]="field.label + ': ' + value"
+                          class="bg-[var(--surface-100)] text-[var(--text-color-secondary)] px-2 py-0.5 rounded-full text-[11px] font-medium truncate max-w-full">{{ value }}</span>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </section>
+}

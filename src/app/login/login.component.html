@@ -1,0 +1,106 @@
+<div class="flex justify-center items-start w-full h-full py-6 overflow-y-auto">
+  <p-card styleClass="w-full max-w-sm shadow-sm border border-[var(--surface-border)]">
+
+    <!-- Branding -->
+    <section class="flex flex-col items-center text-center gap-2 mb-5">
+      <div class="w-20 h-20 rounded-2xl flex items-center justify-center shadow-sm overflow-hidden">
+        <img alt="odoo-timeshit logo"
+             class="w-full h-full object-contain"
+             src="_assets/icons/odoo_shit_timer_icon.svg"/>
+      </div>
+      <h1 class="text-lg font-bold text-[var(--text-color)] m-0">Welcome Back</h1>
+      <p class="text-sm text-[var(--text-color-secondary)] m-0 max-w-[240px]">
+        Because recording your 8 hours shouldn't take 8 hours.
+      </p>
+    </section>
+
+    <!-- Tab switcher -->
+    <div class="flex justify-center mb-10">
+      <p-selectButton
+        [(ngModel)]="loginMode"
+        [allowEmpty]="false"
+        [options]="loginModes"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"/>
+    </div>
+
+    <!-- API login form -->
+    <form (ngSubmit)="connectWithApiKey()"
+          *ngIf="loginMode === LoginMode.API"
+          [formGroup]="form"
+          class="flex flex-col gap-7">
+      <p-floatLabel>
+        <input class="w-full"
+               formControlName="odooBaseUrl"
+               id="odooBaseUrl"
+               pInputText
+               type="text"/>
+        <label for="odooBaseUrl">Base URL</label>
+      </p-floatLabel>
+
+      <p-floatLabel>
+        <p-password [feedback]="false"
+                    [toggleMask]="true"
+                    formControlName="apiKey"
+                    inputId="apiKey"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"/>
+        <label for="apiKey">API Key</label>
+      </p-floatLabel>
+
+      <p-button [disabled]="form.invalid"
+                label="Connect via API"
+                styleClass="w-full justify-center mt-1"
+                type="submit"/>
+    </form>
+
+    <!-- Cookie login form -->
+    <div *ngIf="loginMode === LoginMode.Cookie"
+         [formGroup]="form"
+         class="flex flex-col gap-5">
+      <div class="flex items-start gap-3 p-4 rounded-xl bg-[var(--yellow-50)] border border-[var(--yellow-200)]">
+        <i class="pi pi-exclamation-triangle text-[var(--yellow-600)] mt-0.5"></i>
+        <p class="text-sm text-[var(--text-color-secondary)] m-0">
+          This method is not implemented yet and is coming soon.
+        </p>
+      </div>
+
+      <div class="flex items-start gap-3 p-4 mb-5 rounded-xl bg-[var(--surface-100)] border border-[var(--surface-border)]">
+        <i class="pi pi-info-circle text-[var(--primary-color)] mt-0.5"></i>
+        <p class="text-sm text-[var(--text-color-secondary)] m-0">
+          Ensure you are currently logged into Odoo in another browser tab before using this method.
+        </p>
+      </div>
+
+      <p-floatLabel>
+        <input [disabled]="true"
+               class="w-full"
+               id="cookieBaseUrl"
+               pInputText
+               type="text"/>
+        <label for="cookieBaseUrl">Base URL</label>
+      </p-floatLabel>
+
+      <p-button (onClick)="connectWithCookie()"
+                [outlined]="true"
+                icon="pi pi-bookmark"
+                label="Use browser cookie"
+                styleClass="w-full justify-center mt-1"
+                type="button"/>
+    </div>
+
+    <!-- Footer -->
+    <footer class="flex flex-col items-center gap-3 mt-6">
+      <a class="text-xs font-medium text-[var(--primary-color)] hover:underline"
+         href="#">Help &amp; Setup Guide
+      </a>
+      <div class="flex items-center gap-2 opacity-40">
+        <div class="h-px w-8 bg-[var(--surface-border)]"></div>
+        <span class="text-xs">{{ APP_VERSION }}</span>
+        <div class="h-px w-8 bg-[var(--surface-border)]"></div>
+      </div>
+    </footer>
+
+  </p-card>
+</div>

@@ -1,0 +1,90 @@
+<section class="flex flex-col gap-3">
+  <div class="flex flex-col gap-0.5">
+    <span class="text-sm font-semibold text-[var(--text-color)]">Azure DevOps</span>
+    <p class="text-xs italic text-[var(--text-color-secondary)] m-0">
+      Adds Start / Pause / Stop and a today's-entries picker to work-item pages under this URL.
+    </p>
+  </div>
+
+  <!-- Base URL -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]"
+           for="azure-base-url">BASE URL
+    </label>
+    <input [(ngModel)]="draft.baseUrl"
+           class="w-full font-mono"
+           id="azure-base-url"
+           pInputText
+           placeholder="https://devops.acme.local"/>
+    <span class="text-[11px] text-[var(--text-color-secondary)]">Leave empty to disable the integration.</span>
+  </div>
+
+  <!-- Reuse match field -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]"
+           for="azure-match-field">REUSE KEY TO MATCH WORK ITEM ID AGAINST
+    </label>
+    <p-dropdown [(ngModel)]="draft.matchField"
+                [options]="matchOptions()"
+                inputId="azure-match-field"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"/>
+    <span class="text-[11px] text-[var(--text-color-secondary)]">
+      Today's entry whose value contains the work item id is reused instead of creating a new one.
+    </span>
+  </div>
+
+  <!-- Field associations -->
+  <div class="flex flex-col gap-1.5">
+    <span class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">FIELD ASSOCIATIONS</span>
+    <p class="text-[11px] text-[var(--text-color-secondary)] m-0">
+      Auto-fill a new entry from work-item properties. Source is
+      <span class="font-mono">{{ sourceId }}</span>
+      (work item id),
+      <span class="font-mono">{{ sourceTitle }}</span>
+      (title), or a field label as shown on the
+      page (e.g.
+      <span class="font-mono">Projet</span>
+      ,
+      <span class="font-mono">Tâche</span>
+      ) — a
+      leading
+      <span class="font-mono">&#64;</span>
+      on a label is optional.
+    </p>
+
+    @for (mapping of draft.mappings; track $index) {
+      <div class="flex items-center gap-2">
+        <input [(ngModel)]="mapping.source"
+               class="flex-1 font-mono"
+               pInputText
+               placeholder="@id, @title or a field label"/>
+        <i class="pi pi-arrow-right text-xs text-[var(--text-color-secondary)] shrink-0"></i>
+        <p-dropdown [(ngModel)]="mapping.target"
+                    [options]="targetOptions()"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="flex-1"/>
+        <button (click)="removeMapping(mapping)"
+                aria-label="Remove association"
+                class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors shrink-0">
+          <i class="pi pi-trash text-sm"></i>
+        </button>
+      </div>
+    }
+
+    <p-button (onClick)="addMapping()"
+              [outlined]="true"
+              icon="pi pi-plus"
+              label="Add association"
+              styleClass="w-full justify-center"
+              type="button"/>
+  </div>
+
+  <p-button (onClick)="save()"
+            [loading]="saving"
+            label="Save Azure settings"
+            styleClass="w-full justify-center"
+            type="button"/>
+</section>

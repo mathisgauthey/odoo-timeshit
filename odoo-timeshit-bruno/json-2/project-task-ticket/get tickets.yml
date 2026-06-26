@@ -1,0 +1,40 @@
+info:
+  name: get tickets
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{API}}/helpdesk.ticket/search_read"
+  headers:
+    - name: X-Odoo-Database
+      value: "{{DATABASE}}"
+      disabled: true
+    - name: Host
+      value: "{{HOST}}"
+    - name: Content-Type
+      value: application/json; charset=utf-8
+    - name: User-Agent
+      value: mysoftware python-requests/2.25.1
+  body:
+    type: json
+    data: |-
+      {
+        "domain": [
+          ["name", "ilike", "Saisie de temps"]
+        ],
+        "fields": [
+          "id",
+          "name"
+        ],
+        "order": "id desc"
+      }
+  auth:
+    type: bearer
+    token: "{{API_KEY}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

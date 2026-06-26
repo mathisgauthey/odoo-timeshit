@@ -1,0 +1,27 @@
+info:
+  name: get context
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{API}}/res.users/context_get"
+  headers:
+    - name: X-Odoo-Database
+      value: "{{DATABASE}}"
+      disabled: true
+    - name: Host
+      value: "{{HOST}}"
+    - name: Content-Type
+      value: application/json; charset=utf-8
+    - name: User-Agent
+      value: mysoftware python-requests/2.25.1
+  auth:
+    type: bearer
+    token: "{{API_KEY}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

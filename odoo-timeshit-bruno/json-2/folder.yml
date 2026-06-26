@@ -1,0 +1,14 @@
+info:
+  name: json-2
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit
+  variables:
+    - name: API
+      value: json/2
+    - name: PROJECT_ID
+      value: "1302"
+    - name: TASK_ID
+      value: "20231"

@@ -1,0 +1,47 @@
+info:
+  name: create timesheet entry
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{API}}/account.analytic.line/create"
+  headers:
+    - name: X-Odoo-Database
+      value: "{{DATABASE}}"
+      disabled: true
+    - name: Host
+      value: "{{HOST}}"
+    - name: Content-Type
+      value: application/json; charset=utf-8
+    - name: User-Agent
+      value: mysoftware python-requests/2.25.1
+  body:
+    type: json
+    data: |-
+      {
+        "vals_list": {
+          "name": "New timesheet entry",
+          "date": "2026-06-21",
+          "unit_amount": 1.0,
+          "project_id": {{PROJECT_ID}},
+          "task_id": {{TASK_ID}}
+        }
+      }
+  auth:
+    type: bearer
+    token: "{{API_KEY}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        let data = res.getBody();
+        let newId = Array.isArray(data) ? data[0] : data;
+        bru.setVar("ID", newId);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

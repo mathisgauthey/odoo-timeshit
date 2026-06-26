@@ -1,0 +1,96 @@
+<p-toast/>
+<p-confirmDialog/>
+
+@if (loggedIn()) {
+  @if (settingsOpen()) {
+    <app-settings (goBack)="settingsOpen.set(false)"/>
+  } @else {
+    <div class="flex flex-col h-full w-full">
+      <!-- Top app bar -->
+      <header class="relative h-12 shrink-0 flex items-center justify-between px-3 bg-[var(--surface-0)] border-b border-[var(--surface-border)]">
+        <div class="flex items-center gap-1.5">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+            <img alt="odoo-timeshit logo"
+                 class="w-full h-full object-contain"
+                 src="_assets/icons/icon48.png"/>
+          </div>
+          <span class="text-lg font-bold text-[var(--primary-color)]">odoo-timeshit</span>
+        </div>
+
+        <!-- Running timer, centered; tap to open the timer tab -->
+        @if (timerSvc.timer(); as t) {
+          <button (click)="setTab('timer')"
+                  [title]="t.name"
+                  class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 px-3 h-8 rounded-full border border-[var(--surface-border)] bg-[var(--surface-50)] hover:bg-[var(--surface-100)] transition-colors">
+          <span class="relative flex h-2 w-2 shrink-0">
+            @if (!t.paused) {
+              <span class="absolute inline-flex h-full w-full rounded-full bg-[var(--primary-color)] opacity-60 animate-ping"></span>
+            }
+            <span [style.backgroundColor]="t.paused ? 'var(--text-color-secondary)' : 'var(--primary-color)'"
+                  class="relative inline-flex h-2 w-2 rounded-full"></span>
+          </span>
+            <span class="text-sm font-mono tabular-nums text-[var(--text-color)]">{{ timerSvc.elapsed() }}</span>
+          </button>
+        }
+
+        <div class="flex items-center">
+          <button (click)="settingsOpen.set(true)"
+                  class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors"
+                  title="Custom fields">
+            <i class="pi pi-cog"></i>
+          </button>
+          <button (click)="logout()"
+                  class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors"
+                  title="Logout">
+            <i class="pi pi-sign-out"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Active tab content -->
+      <main class="flex-1 overflow-y-auto bg-[var(--surface-ground)]">
+        @switch (activeTab()) {
+          @case ('timesheet') {
+            <app-weekly-timesheet (edit)="startEdit($event)"/>
+          }
+          @case (Tab.AddOrEdit) {
+            <app-add-or-edit-timesheet (closed)="onEditorClosed()"
+                                       (timerStarted)="onTimerStarted()"
+                                       [azurePrefill]="azurePrefill()"
+                                       [entry]="editingEntry()"/>
+          }
+          @case ('timer') {
+            <app-timer/>
+          }
+        }
+      </main>
+
+      <!-- Bottom navigation -->
+      <nav class="h-16 shrink-0 flex justify-around items-center px-3 bg-[var(--surface-0)] border-t border-[var(--surface-border)]">
+        <button (click)="setTab('timesheet')"
+                [class.font-semibold]="activeTab() === 'timesheet'"
+                [style.color]="activeTab() === 'timesheet' ? 'var(--primary-color)' : 'var(--text-color-secondary)'"
+                class="flex flex-col items-center justify-center gap-0.5 px-4 py-1 rounded-xl transition-all active:scale-95">
+          <i class="pi pi-calendar text-lg"></i>
+          <span class="text-[11px]">Timesheet</span>
+        </button>
+        <button (click)="addOrEditEntry()"
+                [class.font-semibold]="activeTab() === Tab.AddOrEdit"
+                [style.color]="activeTab() === Tab.AddOrEdit ? 'var(--primary-color)' : 'var(--text-color-secondary)'"
+                class="flex flex-col items-center justify-center gap-0.5 px-4 py-1 rounded-xl transition-all active:scale-95">
+          <i [class]="timerSvc.timer() ? 'pi pi-pencil text-lg' : 'pi pi-plus-circle text-lg'"></i>
+          <span class="text-[11px]">{{ timerSvc.timer() ? 'Edit Entry' : 'Add Entry' }}</span>
+        </button>
+        <button (click)="setTab('timer')"
+                [class.font-semibold]="activeTab() === 'timer'"
+                [style.color]="activeTab() === 'timer' ? 'var(--primary-color)' : 'var(--text-color-secondary)'"
+                class="flex flex-col items-center justify-center gap-0.5 px-4 py-1 rounded-xl transition-all active:scale-95">
+          <i class="pi pi-stopwatch text-lg"></i>
+          <span class="text-[11px]">Timer</span>
+        </button>
+      </nav>
+    </div>
+  }
+} @else {
+  <app-login/>
+}

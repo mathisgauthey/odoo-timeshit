@@ -1,0 +1,132 @@
+<div class="px-3 py-4 flex flex-col gap-4">
+  <header class="flex justify-between items-start gap-2">
+    <div class="flex flex-col gap-1">
+      <h2 class="text-lg font-semibold text-[var(--text-color)] m-0">{{ title }}</h2>
+      <p class="text-xs italic text-[var(--text-color-secondary)] m-0">Acknowledging the shittiness of tracking
+        time.</p>
+    </div>
+    @if (editing) {
+      <button (click)="confirmDelete()"
+              [disabled]="deleting"
+              aria-label="Delete this entry"
+              class="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-[var(--red-500)] hover:bg-[var(--surface-100)] disabled:opacity-30 transition-colors"
+              title="Delete entry"
+              type="button">
+        <i class="pi pi-trash"></i>
+      </button>
+    }
+  </header>
+
+  <form (ngSubmit)="save()"
+        class="flex flex-col gap-4">
+    <!-- Date -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">DATE</label>
+      <input [(ngModel)]="date"
+             class="w-full"
+             name="date"
+             pInputText
+             type="date"/>
+    </div>
+
+    <!-- Mode toggle -->
+    <p-selectButton (onChange)="onModeChange()"
+                    [(ngModel)]="mode"
+                    [allowEmpty]="false"
+                    [options]="modes"
+                    name="mode"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="w-full"/>
+
+    <!-- Project / Assistance -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">{{ projectLabel }}</label>
+      <p-autoComplete (completeMethod)="searchProjects($event)"
+                      (onSelect)="clearPrefillError('project')"
+                      [(ngModel)]="project"
+                      [dropdown]="true"
+                      [forceSelection]="true"
+                      [inputStyleClass]="prefillErrors['project'] ? 'w-full !border-[var(--red-500)]' : 'w-full'"
+                      [suggestions]="projectSuggestions"
+                      field="name"
+                      name="project"
+                      placeholder="Search {{ projectLabel.toLowerCase() }}..."
+                      styleClass="w-full"/>
+      @if (prefillErrors['project']; as text) {
+        <span class="text-[11px] text-[var(--red-500)]">No match for "{{ text }}": search or create it.</span>
+      }
+    </div>
+
+    <!-- Task / Ticket -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">{{ secondaryLabel }}</label>
+      <p-autoComplete (completeMethod)="searchSecondary($event)"
+                      (onSelect)="onSecondarySelect($event)"
+                      [(ngModel)]="secondary"
+                      [dropdown]="true"
+                      [forceSelection]="true"
+                      [inputStyleClass]="prefillErrors[secondaryErrorKey] ? 'w-full !border-[var(--red-500)]' : 'w-full'"
+                      [suggestions]="secondarySuggestions"
+                      field="name"
+                      name="secondary"
+                      placeholder="Search {{ secondaryLabel.toLowerCase() }}..."
+                      styleClass="w-full"/>
+      @if (prefillErrors[secondaryErrorKey]; as text) {
+        <span class="text-[11px] text-[var(--red-500)]">No match for "{{ text }}": search or create it.</span>
+      }
+    </div>
+
+    <!-- Description -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">DESCRIPTION</label>
+      <textarea [(ngModel)]="description"
+                class="w-full resize-none"
+                name="description"
+                pInputTextarea
+                placeholder="What did you actually do?"
+                rows="3"></textarea>
+    </div>
+
+    <!-- Time spent: accepts "2:30", "02:30" or "2.5", normalizes to "02:30" on blur -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">TIME SPENT</label>
+      <input (blur)="onTimeBlur()"
+             (ngModelChange)="onTimeInput($event)"
+             [ngModel]="timeText"
+             class="w-full font-mono"
+             name="time"
+             pInputText
+             placeholder="2:30 or 2.5"/>
+    </div>
+
+    <!-- Instance-specific custom fields -->
+    @for (field of customFields(); track field.name) {
+      <app-custom-field (valueChange)="customValues[field.name] = $event; clearPrefillError(field.name)"
+                        [field]="field"
+                        [invalid]="!!prefillErrors[field.name]"
+                        [value]="customValues[field.name]"/>
+    }
+
+    <!-- Actions -->
+    <div class="flex gap-3 mt-2">
+      <p-button (onClick)="reset()"
+                [outlined]="true"
+                label="Cancel"
+                styleClass="w-full justify-center"
+                type="button"/>
+      <p-button [disabled]="!canSave"
+                [label]="saveLabel"
+                [loading]="saving"
+                styleClass="w-full justify-center"
+                type="submit"/>
+      <p-button (onClick)="startTimer()"
+                [disabled]="!canStartTimer"
+                [loading]="starting"
+                icon="pi pi-play"
+                label="Timer"
+                styleClass="w-full justify-center"
+                type="button"/>
+    </div>
+  </form>
+</div>

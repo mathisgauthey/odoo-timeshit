@@ -1,0 +1,6 @@
+name: prod
+variables:
+  - secret: true
+    name: BASE_URL
+  - secret: true
+    name: API_KEY

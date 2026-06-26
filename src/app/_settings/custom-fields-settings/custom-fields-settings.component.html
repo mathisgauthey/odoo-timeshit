@@ -1,0 +1,119 @@
+<section class="flex flex-col gap-3">
+  <div class="flex flex-col gap-0.5">
+    <span class="text-sm font-semibold text-[var(--text-color)]">Custom fields</span>
+    <p class="text-xs italic text-[var(--text-color-secondary)] m-0">
+      Extra fields specific to your Odoo instance. They show up in the entry editor and the weekly list.
+    </p>
+  </div>
+
+  <!-- Configured fields -->
+  <div class="flex flex-col gap-2">
+    @for (field of config.customFields(); track field.name) {
+      <div class="flex items-center gap-2 p-3 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-0)]">
+        <div class="flex-1 overflow-hidden">
+          <div class="text-sm font-semibold text-[var(--text-color)] truncate">{{ field.label }}</div>
+          <div class="text-[11px] text-[var(--text-color-secondary)] truncate">
+            <span class="font-mono">{{ field.name }}</span>
+            · {{ field.type }}{{ field.relation ? ' → ' + field.relation : '' }}
+          </div>
+        </div>
+        <button (click)="startEdit(field)"
+                aria-label="Edit field"
+                class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors">
+          <i class="pi pi-pencil text-sm"></i>
+        </button>
+        <button (click)="remove(field.name)"
+                aria-label="Remove field"
+                class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors">
+          <i class="pi pi-trash text-sm"></i>
+        </button>
+      </div>
+    } @empty {
+      <p class="text-sm text-[var(--text-color-secondary)] text-center py-4 m-0">No custom fields yet.</p>
+    }
+  </div>
+
+  <!-- Add / edit draft -->
+  @if (draft; as d) {
+    <div class="flex flex-col gap-3 p-3 rounded-lg border border-[var(--primary-color)] bg-[var(--surface-0)]">
+      <span class="text-xs font-semibold tracking-wide uppercase text-[var(--primary-color)]">
+        {{ editingOriginalName ? 'Edit field' : 'New field' }}
+      </span>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]"
+               for="custom-field-name">TECHNICAL NAME
+        </label>
+        <div class="flex gap-2">
+          <input [(ngModel)]="d.name"
+                 class="w-full font-mono"
+                 id="custom-field-name"
+                 pInputText
+                 placeholder="e.g. user_id"/>
+          <p-button (onClick)="detect()"
+                    [loading]="loadingService.loading$ | async"
+                    icon="pi pi-search"
+                    label="Detect"
+                    styleClass="shrink-0"
+                    type="button"/>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]"
+               for="custom-field-label">LABEL
+        </label>
+        <input [(ngModel)]="d.label"
+               class="w-full"
+               id="custom-field-label"
+               pInputText
+               placeholder="e.g. Partner"/>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]"
+               for="custom-field-type">TYPE
+        </label>
+        <p-dropdown [(ngModel)]="d.type"
+                    [options]="typeOptions"
+                    inputId="custom-field-type"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="w-full"/>
+      </div>
+
+      @if (d.type === FieldType.Many2one) {
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]"
+                 for="custom-field-relation">RELATED MODEL
+          </label>
+          <input [(ngModel)]="d.relation"
+                 class="w-full font-mono"
+                 id="custom-field-relation"
+                 pInputText
+                 placeholder="e.g. res.partner"/>
+        </div>
+      }
+
+      <div class="flex gap-3 mt-1">
+        <p-button (onClick)="cancelDraft()"
+                  [outlined]="true"
+                  label="Cancel"
+                  styleClass="w-full justify-center"
+                  type="button"/>
+        <p-button (onClick)="save()"
+                  [disabled]="!canSave"
+                  label="Save"
+                  styleClass="w-full justify-center"
+                  type="button"/>
+      </div>
+    </div>
+  } @else {
+    <p-button (onClick)="startAdd()"
+              [outlined]="true"
+              icon="pi pi-plus"
+              label="Add custom field"
+              styleClass="w-full justify-center"
+              type="button"/>
+  }
+</section>

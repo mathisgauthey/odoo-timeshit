@@ -1,0 +1,44 @@
+info:
+  name: get timesheet entry
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{API}}/account.analytic.line/read"
+  headers:
+    - name: X-Odoo-Database
+      value: "{{DATABASE}}"
+      disabled: true
+    - name: Host
+      value: "{{HOST}}"
+    - name: Content-Type
+      value: application/json; charset=utf-8
+    - name: User-Agent
+      value: mysoftware python-requests/2.25.1
+  body:
+    type: json
+    data: |-
+      {
+        "ids": [{{ID}}
+        ],
+        "fields": [
+          "id",
+          "name",
+          "date",
+          "unit_amount",
+          "project_id",
+          "task_id",
+          "employee_id",
+          "helpdesk_ticket_id"
+        ]
+      }
+  auth:
+    type: bearer
+    token: "{{API_KEY}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

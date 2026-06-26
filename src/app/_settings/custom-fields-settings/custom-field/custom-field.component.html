@@ -1,0 +1,82 @@
+<div class="flex flex-col gap-1.5">
+  <label [for]="'cf-' + field().name"
+         class="text-xs font-semibold tracking-wide text-[var(--text-color-secondary)]">{{ field().label.toUpperCase() }}
+  </label>
+
+  @switch (widget) {
+    @case (Widget.Relation) {
+      <p-autoComplete (completeMethod)="search($event)"
+                      (ngModelChange)="value.set($event)"
+                      (onSelect)="onSelect($event)"
+                      [dropdown]="true"
+                      [forceSelection]="true"
+                      [inputId]="'cf-' + field().name"
+                      [inputStyleClass]="invalid() ? 'w-full !border-[var(--red-500)]' : 'w-full'"
+                      [ngModel]="value()"
+                      [suggestions]="suggestions"
+                      optionLabel="name"
+                      placeholder="Search {{ field().label.toLowerCase() }}..."
+                      styleClass="w-full"/>
+      @if (invalid()) {
+        <span class="text-[11px] text-[var(--red-500)]">No match found: search or create it.</span>
+      }
+    }
+    @case (Widget.Number) {
+      <input (ngModelChange)="value.set($event)"
+             [id]="'cf-' + field().name"
+             [ngModel]="value()"
+             class="w-full"
+             pInputText
+             type="number"/>
+    }
+    @case (Widget.Boolean) {
+      <p-checkbox (ngModelChange)="value.set($event)"
+                  [binary]="true"
+                  [inputId]="'cf-' + field().name"
+                  [ngModel]="value()"/>
+    }
+    @case (Widget.Date) {
+      <input (ngModelChange)="value.set($event)"
+             [id]="'cf-' + field().name"
+             [ngModel]="value()"
+             class="w-full"
+             pInputText
+             type="date"/>
+    }
+    @case (Widget.Datetime) {
+      <input (ngModelChange)="value.set($event)"
+             [id]="'cf-' + field().name"
+             [ngModel]="value()"
+             class="w-full"
+             pInputText
+             type="datetime-local"/>
+    }
+    @case (Widget.Selection) {
+      <p-dropdown (ngModelChange)="value.set($event)"
+                  [inputId]="'cf-' + field().name"
+                  [ngModel]="value()"
+                  [options]="selectOptions"
+                  [showClear]="true"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select..."
+                  styleClass="w-full"/>
+    }
+    @case (Widget.Textarea) {
+      <textarea (ngModelChange)="value.set($event)"
+                [id]="'cf-' + field().name"
+                [ngModel]="value()"
+                class="w-full resize-none"
+                pInputTextarea
+                rows="2"></textarea>
+    }
+    @default {
+      <input (ngModelChange)="value.set($event)"
+             [id]="'cf-' + field().name"
+             [ngModel]="value()"
+             class="w-full"
+             pInputText
+             type="text"/>
+    }
+  }
+</div>
