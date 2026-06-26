@@ -1,4 +1,4 @@
-import {inject, Injectable} from "@angular/core";
+import {inject, Injectable, Injector} from "@angular/core";
 import {MessageService} from "primeng/api";
 import {AuthService} from "./auth.service";
 import {OdooHttpError} from "../_models/odoo/odoo-http-error.model";
@@ -15,7 +15,9 @@ import {OdooHttpError} from "../_models/odoo/odoo-http-error.model";
 @Injectable({providedIn: 'root'})
 export class ErrorService {
   private readonly messages = inject(MessageService);
-  private readonly auth = inject(AuthService);
+  // Resolved lazily to break the OdooService → ErrorService → AuthService → OdooService
+  // DI cycle; `logout` is only ever needed at handle() time, not at construction.
+  private readonly injector = inject(Injector);
 
   handle(error: OdooHttpError): void {
     const detail = this.detailOf(error);
@@ -29,7 +31,7 @@ export class ErrorService {
       case 401:
       case 403:
         this.toast('Session expired', detail ?? 'Your API key looks invalid or expired. Please sign in again.');
-        this.auth.logout();
+        this.injector.get(AuthService).logout();
         break;
       case 404:
         this.toast('Not found', detail ?? 'The requested resource no longer exists.');
