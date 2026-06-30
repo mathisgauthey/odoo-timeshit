@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.0.2...1.1.0) (2026-06-30)
+
+### Features
+
+* **weekly-timesheet:** ✨ Sort entries by last-modified timestamp ([e4db04a](https://github.com/mathisgauthey/odoo-timeshit/commit/e4db04a64b782fa52cc683f99ebd1964d1e7d758)), closes [#1](https://github.com/mathisgauthey/odoo-timeshit/issues/1)
+
 ## [1.0.2](https://github.com/mathisgauthey/odoo-timeshit/compare/1.0.1...1.0.2) (2026-06-30)
 
 ### Bug Fixes
