@@ -1,5 +1,5 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
-import {formatHms, label, TIMER_STORAGE_KEY, TimerState, timerStateFromRunning} from './timer-state';
+import {formatHms, TIMER_STORAGE_KEY, TimerState, timerStateFromRunning} from './timer-state';
 import {OdooService} from "../../_services/odoo/odoo.service";
 import {StorageService} from "../../_services/storage.service";
 
@@ -56,18 +56,13 @@ export class TimerService {
     if (this.busy()) return;
     this.busy.set(true);
     try {
-      // Read fresh accumulated hours, then start the timer and anchor our local clock.
-      const fresh = await this.odoo.fetchTimesheetEntry(entryId);
       await this.odoo.startTimer(entryId);
-      this.setState({
-        lineId: entryId,
-        name: fresh.name || 'Untitled',
-        projectName: label(fresh.project_id),
-        taskName: label(fresh.task_id),
-        baseHours: fresh.unit_amount,
-        segmentStartMs: Date.now(),
-        paused: false,
-      });
+      // Odoo may attach the timer to a *different* line than `entryId`: starting
+      // from a past entry creates a fresh line dated today and runs the timer on
+      // that one instead. So re-read the authoritative running timer rather than
+      // assume it landed on `entryId` (otherwise the pill renders on the source
+      // row with that row's accumulated hours as its base).
+      this.setState(timerStateFromRunning(await this.odoo.fetchRunningTimer()));
     } finally {
       this.busy.set(false);
     }
