@@ -4,3 +4,5 @@ variables:
     name: BASE_URL
   - secret: true
     name: API_KEY
+  - secret: true
+    name: HOST

@@ -20,14 +20,8 @@ http:
     type: json
     data: |-
       {
-        "domain": [
-          [
-            "is_timer_running",
-            "=",
-            true
-          ]
-        ],
-        "fields": [
+        "domain": [["user_timer_id", "!=", false]],
+      "fields": [
           "id",
           "name",
           "date",
