@@ -20,8 +20,8 @@ import {StorageService} from "../../_services/storage.service";
 export class TimerService {
   readonly timer = signal<TimerState | null>(null);
   readonly busy = signal(false);
-  private odoo = inject(OdooService);
-  private storage = inject(StorageService);
+  private readonly odoo = inject(OdooService);
+  private readonly storage = inject(StorageService);
   /** Ticks once a second to drive the elapsed display. */
   private readonly now = signal(Date.now());
   readonly elapsed = computed(() => {
