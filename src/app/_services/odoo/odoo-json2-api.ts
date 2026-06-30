@@ -209,11 +209,18 @@ export class OdooJson2Api {
    * @returns The running timer entry, or null if no timer is running.
    */
   async fetchRunningTimer(): Promise<RunningTimer | null> {
-    const result = await this.call(TIMESHEET_MODEL, ODOO_SEARCH, {
-      domain: [['is_timer_running', '=', true]],
+    // `is_timer_running` is false while paused (Odoo: timer_start AND NOT
+    // timer_pause), and `timer_pause` has no search method so it can't be
+    // queried directly.
+    // A line keeps its timer record until stopped (stop
+    // unlinks it), so match on the searchable `user_timer_id` relation to get
+    // both running and paused timers, then prefer the running one.
+    const result: RunningTimer[] = await this.call(TIMESHEET_MODEL, ODOO_SEARCH, {
+      domain: [['user_timer_id', '!=', false]],
       fields: RUNNING_TIMER_FIELDS,
     });
-    return result?.[0] ?? null;
+    if (!result?.length) return null;
+    return result.find(t => t.is_timer_running) ?? result[0];
   }
 
   /**

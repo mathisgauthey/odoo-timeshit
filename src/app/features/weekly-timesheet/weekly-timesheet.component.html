@@ -89,22 +89,8 @@
             <div class="flex justify-between items-start gap-2">
               <span class="text-sm font-bold text-[var(--text-color)] truncate">{{ entry.name || 'Untitled' }}</span>
               <div class="flex items-center gap-1.5 shrink-0 group/time">
-                @if (timerSvc.timer()?.lineId !== entry.id) {
-                  <button (click)="$event.stopPropagation(); startTimer(entry)"
-                          [disabled]="timerSvc.busy()"
-                          aria-label="Start timer on this entry"
-                          class="opacity-0 group-hover/time:opacity-100 focus:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 rounded-full text-[var(--primary-color)] hover:bg-[var(--surface-100)] disabled:opacity-30">
-                    <i class="pi pi-play text-[10px]"></i>
-                  </button>
-                }
-                <button (click)="$event.stopPropagation(); confirmDelete(entry)"
-                        [disabled]="deletingId() === entry.id"
-                        aria-label="Delete this entry"
-                        class="opacity-0 group-hover/time:opacity-100 focus:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 rounded-full text-[var(--red-500)] hover:bg-[var(--surface-100)] disabled:opacity-30">
-                  <i class="pi pi-trash text-[10px]"></i>
-                </button>
                 @if (timerSvc.timer()?.lineId === entry.id) {
-                  <!-- Timer running on this entry: live, unsaved elapsed pulsing like a loader. -->
+                  <!-- Timer attached to this entry: live, unsaved elapsed pulsing like a loader. -->
                   <span (click)="$event.stopPropagation()"
                         [class.animate-pulse]="!timerSvc.timer()?.paused"
                         [title]="(timerSvc.timer()?.paused ? 'Timer paused' : 'Timer running') + ' — live, not yet saved'"
@@ -112,7 +98,45 @@
                     <i class="pi pi-circle-fill text-[6px]"></i>
                     {{ timerSvc.elapsed() }}
                   </span>
+                  @if (timerSvc.timer()?.paused) {
+                    <button (click)="$event.stopPropagation(); resumeTimer()"
+                            [disabled]="timerSvc.busy()"
+                            aria-label="Resume timer"
+                            class="flex items-center justify-center w-6 h-6 rounded-full text-[var(--primary-color)] hover:bg-[var(--surface-100)] disabled:opacity-30"
+                            title="Resume timer">
+                      <i class="pi pi-play text-[10px]"></i>
+                    </button>
+                  } @else {
+                    <button (click)="$event.stopPropagation(); pauseTimer()"
+                            [disabled]="timerSvc.busy()"
+                            aria-label="Pause timer"
+                            class="flex items-center justify-center w-6 h-6 rounded-full text-[var(--primary-color)] hover:bg-[var(--surface-100)] disabled:opacity-30"
+                            title="Pause timer">
+                      <i class="pi pi-pause text-[10px]"></i>
+                    </button>
+                  }
+                  <button (click)="$event.stopPropagation(); stopTimer()"
+                          [disabled]="timerSvc.busy()"
+                          aria-label="Stop timer"
+                          class="flex items-center justify-center w-6 h-6 rounded-full text-[var(--red-500)] hover:bg-[var(--surface-100)] disabled:opacity-30"
+                          title="Stop timer and save">
+                    <i class="pi pi-stop text-[10px]"></i>
+                  </button>
                 } @else {
+                  <button (click)="$event.stopPropagation(); startTimer(entry)"
+                          [disabled]="timerSvc.busy()"
+                          aria-label="Start timer on this entry"
+                          class="opacity-0 group-hover/time:opacity-100 focus:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 rounded-full text-[var(--primary-color)] hover:bg-[var(--surface-100)] disabled:opacity-30"
+                          title="Start timer">
+                    <i class="pi pi-play text-[10px]"></i>
+                  </button>
+                  <button (click)="$event.stopPropagation(); confirmDelete(entry)"
+                          [disabled]="deletingId() === entry.id"
+                          aria-label="Delete this entry"
+                          class="opacity-0 group-hover/time:opacity-100 focus:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 rounded-full text-[var(--red-500)] hover:bg-[var(--surface-100)] disabled:opacity-30"
+                          title="Delete entry">
+                    <i class="pi pi-trash text-[10px]"></i>
+                  </button>
                   <input #dur
                          (blur)="saveDuration(entry, dur.value, dur)"
                          (click)="$event.stopPropagation()"

@@ -35,14 +35,22 @@ export function timerStateFromRunning(running: RunningTimer | null): TimerState 
   const startMs = running.timer_start
     ? Date.parse(running.timer_start.replace(' ', 'T') + 'Z')
     : Date.now();
+  const pause = running.timer_pause;
+  const paused = typeof pause === 'string';
+  // While paused, the line's `unit_amount` doesn't yet include the segment that
+  // ran before the pause, so fold `timer_start -> timer_pause` into baseHours to
+  // freeze the elapsed display at the right value (mirrors TimerService.pause()).
+  const baseHours = paused
+    ? running.unit_amount + Math.max(0, Date.parse(pause.replace(' ', 'T') + 'Z') - startMs) / 3_600_000
+    : running.unit_amount;
   return {
     lineId: running.id,
     name: running.name || 'Untitled',
     projectName: label(running.project_id),
     taskName: label(running.task_id),
-    baseHours: running.unit_amount,
+    baseHours,
     segmentStartMs: startMs,
-    paused: !!running.timer_pause,
+    paused,
   };
 }
 

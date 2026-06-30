@@ -163,6 +163,34 @@ export class WeeklyTimesheetComponent implements OnInit {
     }
   }
 
+  /** Pause the running timer (keeps it attached to its entry). */
+  async pauseTimer(): Promise<void> {
+    try {
+      await this.timerSvc.pause();
+    } catch {
+      // Request failures are toasted centrally by ErrorService.
+    }
+  }
+
+  /** Resume a paused timer. */
+  async resumeTimer(): Promise<void> {
+    try {
+      await this.timerSvc.resume();
+    } catch {
+      // Request failures are toasted centrally by ErrorService.
+    }
+  }
+
+  /** Stop the running timer and refresh the list so the saved hours show up. */
+  async stopTimer(): Promise<void> {
+    try {
+      await this.timerSvc.stop();
+      await this.load();
+    } catch {
+      // Request failures are toasted centrally by ErrorService.
+    }
+  }
+
   /**
    * Rescale a day's entries so they sum to the daily target, in 5-minute steps
    * (Odoo's granularity), weighted by each entry's current duration. Works in both
