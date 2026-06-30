@@ -1,5 +1,5 @@
 export const TIMESHEET_FIELDS = [
-  'id', 'name', 'date', 'unit_amount',
+  'id', 'name', 'date', 'unit_amount', 'write_date',
   'project_id', 'task_id', 'employee_id', 'helpdesk_ticket_id',
 ];
 export const RUNNING_TIMER_FIELDS = [

@@ -75,7 +75,11 @@ export class WeeklyTimesheetComponent implements OnInit {
     `${formatDayMonth(this.weekStart())} - ${formatDayMonth(addDays(this.weekStart(), 6))}`
   );
   private readonly todayIso = toIso(new Date());
-  /** Entries grouped by day, newest day first (entries already come date-desc). */
+  /**
+   * Entries grouped by day, newest day first; within each day the most recently
+   * modified entry comes first, so the line you last touched is at the top and
+   * the order reflects what you worked on when.
+   */
   readonly groups = computed<DayGroup[]>(() => {
     const byDate = new Map<string, TimesheetEntry[]>();
     for (const e of this.entries()) {
@@ -87,7 +91,8 @@ export class WeeklyTimesheetComponent implements OnInit {
         date,
         label: date === this.todayIso ? `Today • ${formatDayMonth(date)}` : formatDayMonth(date),
         totalHours: entries.reduce((sum, e) => sum + e.unit_amount, 0),
-        entries,
+        // write_date is a fixed-width UTC datetime, so a string compare sorts it.
+        entries: [...entries].sort((a, b) => b.write_date.localeCompare(a.write_date)),
       }));
   });
   /** Hours logged per ISO date, derived once from the entry list. */
