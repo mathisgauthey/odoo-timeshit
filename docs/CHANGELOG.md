@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/mathisgauthey/odoo-timeshit/compare/1.0.1...1.0.2) (2026-06-30)
+
+### Bug Fixes
+
+* **login:** 🔥 Remove unused form controls in login form ([7c45777](https://github.com/mathisgauthey/odoo-timeshit/commit/7c45777ef649a4c76a19f819ac136e6c740e1bcd)), closes [#9](https://github.com/mathisgauthey/odoo-timeshit/issues/9)
+
 ## [1.0.1](https://github.com/mathisgauthey/odoo-timeshit/compare/1.0.0...1.0.1) (2026-06-30)
 
 ### Bug Fixes
