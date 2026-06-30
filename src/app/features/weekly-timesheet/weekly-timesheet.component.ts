@@ -157,6 +157,9 @@ export class WeeklyTimesheetComponent implements OnInit {
     }
     try {
       await this.timerSvc.start(entry.id);
+      // Starting from a past entry makes Odoo spin up a fresh line dated today;
+      // reload so that new line shows up (with its running pill) under today.
+      await this.load();
       this.messages.add({severity: 'success', summary: 'Timer started', detail: entry.name || 'Untitled'});
     } catch {
       // Request failures are toasted centrally by ErrorService.
