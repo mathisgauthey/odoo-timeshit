@@ -47,8 +47,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(private readonly fb: FormBuilder, private readonly auth: AuthService, private readonly messages: MessageService, private readonly storage: StorageService) {
     this.form = this.fb.group({
       odooBaseUrl: ['', [Validators.required]],
-      odooDb: ['', [Validators.required]],
-      odooUsername: ['', [Validators.required, Validators.email]],
       apiKey: ['', [Validators.required]]
     });
   }
