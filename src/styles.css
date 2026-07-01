@@ -31,6 +31,21 @@ html, body, app-root {
 }
 
 /*
+ * When a PrimeNG modal opens it blocks body scroll and, to avoid a content jump
+ * from the disappearing scrollbar, adds `padding-right: var(--scrollbar-width)`
+ * to the body via `.p-overflow-hidden`. That width is computed as
+ * `window.innerWidth - html.offsetWidth`; because this popup pins html/body to a
+ * fixed 800px, under `ng serve` (window wider than 800px) it resolves to a bogus
+ * ~400px and — with border-box sizing — collapses the whole app to half width.
+ * The popup is `overflow: hidden` and never has a real body scrollbar, so there
+ * is nothing to compensate: force the padding to zero (a no-op in the real
+ * 800px extension popup, where the value is already 0).
+ */
+body.p-overflow-hidden {
+  padding-right: 0 !important;
+}
+
+/*
  * Day-balance confirm dialog: the before/after preview is passed as a message
  * string and rendered via [innerHTML], so Angular's sanitizer strips inline
  * styles, these global classes carry the layout instead.
