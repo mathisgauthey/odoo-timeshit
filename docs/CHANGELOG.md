@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/mathisgauthey/odoo-timeshit/compare/1.2.0...1.2.1) (2026-07-01)
+
+### Bug Fixes
+
+* **api:** 🐛 Add support for `call_kw` positional argument translation ([8790384](https://github.com/mathisgauthey/odoo-timeshit/commit/8790384f323354caf4e7c8d1fc355574bb81923f)), closes [#15](https://github.com/mathisgauthey/odoo-timeshit/issues/15)
+
 ## [1.2.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.1.0...1.2.0) (2026-07-01)
 
 ### Features
