@@ -50,7 +50,12 @@ chrome?.storage?.onChanged.addListener((changes: any, area: string) => {
 });
 getStorage<TimerState>(TIMER_STORAGE_KEY).then(syncBadge);
 
-/** Shows a coloured dot on the action icon while a timer is active (green = running, amber = paused). */
+/**
+ * Shows a coloured dot on the action icon while a timer is active, matching the
+ * popup's timer badge: primary purple while running, secondary slate while paused.
+ * Colours mirror the PrimeNG aura-light-purple theme's --primary-color /
+ * --text-color-secondary (a badge can't read CSS vars, so they're hardcoded).
+ */
 function syncBadge(state: TimerState | null): void {
   const action = chrome?.action;
   if (!action) return;
@@ -59,10 +64,22 @@ function syncBadge(state: TimerState | null): void {
     action.setTitle?.({title: ''});
     return;
   }
-  action.setBadgeText({text: '●'});
-  action.setBadgeBackgroundColor({color: state.paused ? '#f59e0b' : '#22c55e'});
+  action.setBadgeText({
+    text: state.paused
+      ? '⏸'
+      : '⏵'
+  });
+  action.setBadgeBackgroundColor({
+    color: state.paused
+      ? '#64748b'
+      : '#8B5CF6'
+  });
   action.setBadgeTextColor?.({color: '#ffffff'});
-  action.setTitle?.({title: `${state.paused ? 'Paused' : 'Timer running'} — ${state.name}`});
+  action.setTitle?.({
+    title: `${state.paused
+      ? 'Paused'
+      : 'Timer running'} — ${state.name}`
+  });
 }
 
 async function handle(message: any): Promise<unknown> {
