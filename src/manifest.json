@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Odoo Timesheet Tracker",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Track timesheets in Odoo directly from your browser. Includes Azure DevOps timer integration.",
   "permissions": [
     "storage",

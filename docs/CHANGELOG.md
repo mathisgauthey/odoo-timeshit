@@ -1,3 +1,10 @@
+## [1.7.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.6.0...1.7.0) (2026-07-01)
+
+### Features
+
+* **debug:** ✨ Add release notes modal and integration in toolbar ([d5e6168](https://github.com/mathisgauthey/odoo-timeshit/commit/d5e6168b959b973c4282c502dd87e994baa51381)), closes [#28](https://github.com/mathisgauthey/odoo-timeshit/issues/28)
+* **debug:** 🐛 Add debug info modal with environment details and actions ([84191e3](https://github.com/mathisgauthey/odoo-timeshit/commit/84191e327055e0b0ec5bfa84cd0f4ed9b55ed91d)), closes [#21](https://github.com/mathisgauthey/odoo-timeshit/issues/21)
+
 ## [1.6.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.5.0...1.6.0) (2026-07-01)
 
 ### Features
