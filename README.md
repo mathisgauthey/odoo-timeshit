@@ -35,21 +35,21 @@ The Odoo web timesheet UI is slow to navigate, breaks your flow, and forces you 
 
 ## Screenshots
 
-|                    Login                     |                   Weekly timesheet                   |
-| :------------------------------------------: |:----------------------------------------------------:|
-| ![Login](docs/screenshots/login.png)         |       ![Weekly timesheet](![img.png](img.png)        |
+|            Login             |                   Weekly timesheet                   |
+|:----------------------------:|:----------------------------------------------------:|
+| ![login.png](docs/login.png) | ![weekly-timesheets.png](docs/weekly-timesheets.png) |
 
-|                Add / edit entry                |                  Timer                   |
-| :--------------------------------------------: | :--------------------------------------: |
-| ![Add or edit](docs/screenshots/add-edit.png)  | ![Timer](docs/screenshots/timer.png)     |
+|             Add / edit entry             |            Timer             |
+|:----------------------------------------:|:----------------------------:|
+| ![add-or-edit.png](docs/add-or-edit.png) | ![timer.png](docs/timer.png) |
 
-|                  Settings                  |             Azure DevOps integration             |
-| :----------------------------------------: | :----------------------------------------------: |
-| ![Settings](docs/screenshots/settings.png) | ![Azure DevOps](docs/screenshots/azure.png)      |
+|              Settings              | Informations                             | Release Notes                                |
+|:----------------------------------:|------------------------------------------|----------------------------------------------|
+| ![settings.png](docs/settings.png) | ![debug-infos.png](docs/debug-infos.png) | ![release-notes.png](docs/release-notes.png) |
 
-|                 Debug Info                 |                Release Notes                |
-|:------------------------------------------:|:-------------------------------------------:|
-| ![Settings](docs/screenshots/settings.png) | ![Azure DevOps](docs/screenshots/azure.png) |
+| Azure Widget                                                                                                       | Azure Prefilled Pop-Up                     |
+|--------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| ![azure-widget-empty.png](docs/azure-widget-empty.png) <br/>![azure-widget-timer.png](docs/azure-widget-timer.png) | ![azure-pop-up.png](docs/azure-pop-up.png) |
 
 ## Features
 
