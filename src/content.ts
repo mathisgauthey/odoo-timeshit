@@ -317,8 +317,8 @@ function render(): void {
       <span class="ots-tag">odoo</span>
       <span class="ots-elapsed" data-elapsed>${elapsedText(running)}</span>
       <span class="ots-task" title="${escapeHtml(running.name)}">${escapeHtml(running.name)}</span>
-      <button class="ots-btn" data-act="pauseResume" ${busy ? 'disabled' : ''} title="${running.paused ? 'Resume' : 'Pause'}">${running.paused ? '▶' : '❚❚'}</button>
-      <button class="ots-btn ots-stop" data-act="stop" ${busy ? 'disabled' : ''} title="Stop &amp; save">■</button>
+      <button class="ots-btn ots-icon" data-act="pauseResume" ${busy ? 'disabled' : ''} title="${running.paused ? 'Resume' : 'Pause'}">${running.paused ? '⏵' : '⏸'}</button>
+      <button class="ots-btn ots-icon ots-stop" data-act="stop" ${busy ? 'disabled' : ''} title="Stop &amp; save">■</button>
     `;
   } else {
     const options = [
@@ -328,7 +328,7 @@ function render(): void {
     el.innerHTML = `
       <span class="ots-tag">odoo</span>
       <select class="ots-select" data-act="select" ${busy ? 'disabled' : ''}>${options}</select>
-      <button class="ots-btn ots-start" data-act="start" ${busy ? 'disabled' : ''} title="Start timer">▶ Start</button>
+      <button class="ots-btn ots-start" data-act="start" ${busy ? 'disabled' : ''} title="Start timer">⏵ Start</button>
     `;
   }
   if (statusText) {
@@ -427,6 +427,13 @@ const WIDGET_CSS = `
   font-weight: 600;
   cursor: pointer;
   line-height: 1;
+}
+.ots-icon {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+  /* The pause glyph is two chars (❚❚) vs stop's single ■; a fixed square keeps
+     both buttons identical regardless of glyph width. */
 }
 .ots-btn:hover { background: #6a3df0; }
 .ots-btn:disabled { opacity: .5; cursor: default; }
