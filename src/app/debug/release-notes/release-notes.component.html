@@ -1,0 +1,57 @@
+<p-dialog (visibleChange)="visible.set($event)"
+          [dismissableMask]="true"
+          [draggable]="false"
+          [modal]="true"
+          [resizable]="false"
+          [style]="{width: '30rem', maxWidth: '92vw'}"
+          [visible]="visible()"
+          appendTo="body"
+          header="Release notes">
+  @if (loading()) {
+    <div class="flex justify-center py-8">
+      <p-progressSpinner [style]="{width: '2.5rem', height: '2.5rem'}" strokeWidth="4"/>
+    </div>
+  } @else if (failed()) {
+    <div class="flex flex-col items-center gap-2 py-8 text-center text-[var(--text-color-secondary)]">
+      <i class="pi pi-exclamation-triangle text-2xl"></i>
+      <span class="text-sm">Couldn't load the changelog.</span>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-5 max-h-[60vh] overflow-y-auto pr-1">
+      @for (release of releases(); track release.version) {
+        <section class="flex flex-col gap-2">
+          <header class="flex items-baseline gap-2">
+            <h3 class="text-base font-semibold text-[var(--primary-color)] m-0">v{{ release.version }}</h3>
+            @if (release.date) {
+              <span class="text-xs text-[var(--text-color-secondary)]">{{ release.date }}</span>
+            }
+          </header>
+          @for (group of release.groups; track group.title) {
+            @if (group.title) {
+              <span class="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-secondary)]">{{ group.title }}</span>
+            }
+            <ul class="list-disc pl-5 m-0 flex flex-col gap-1">
+              @for (item of group.items; track item.text) {
+                <li class="text-sm text-[var(--text-color)]">
+                  @if (item.scope) {
+                    <span class="font-semibold">{{ item.scope }}:</span>
+                  }
+                  {{ item.text }}
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    </div>
+
+    <hr class="border-t border-[var(--surface-border)] my-4"/>
+    <a [href]="changelogUrl"
+       class="flex items-center gap-2 text-sm text-[var(--primary-color)] hover:underline"
+       rel="noopener noreferrer"
+       target="_blank">
+      <i class="pi pi-external-link"></i>
+      <span>Full changelog</span>
+    </a>
+  }
+</p-dialog>
