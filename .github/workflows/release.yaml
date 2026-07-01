@@ -44,7 +44,9 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        # semantic-release computes the version, then its `prepare` step bumps
-        # APP_VERSION, rebuilds so the artifact carries that version, and zips
-        # dist/odoo-timeshit. The build/test steps above are a pre-release gate.
-        run: npx --package semantic-release@25.0.3 --package @semantic-release/commit-analyzer@13.0.1 --package @semantic-release/release-notes-generator@14.1.0 --package conventional-changelog-conventionalcommits@9.1.0 --package @semantic-release/changelog@6.0.3 --package @semantic-release/exec@7.1.0 --package @semantic-release/git@10.0.1 --package @semantic-release/github@12.0.6 semantic-release
+        # semantic-release computes the version, then its `prepare` steps bump
+        # package.json (@semantic-release/npm), sync src/manifest.json, rebuild so
+        # the artifact carries that version (webpack inlines it as __APP_VERSION__),
+        # and zip dist/odoo-timeshit. The build/test steps above are a pre-release
+        # gate. semantic-release and its plugins are local devDependencies.
+        run: npm run release
