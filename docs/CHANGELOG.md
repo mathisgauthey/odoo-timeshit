@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.4.0...1.5.0) (2026-07-01)
+
+### Features
+
+* **azure-integration:** ✨ Add support for closing Azure popups on new entry save / timer starter. Also better sizing of window, finally... ([e162cf2](https://github.com/mathisgauthey/odoo-timeshit/commit/e162cf2e060a0129b8a658bedaead9096d70bd32))
+
 ## [1.4.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.3.0...1.4.0) (2026-07-01)
 
 ### Features
