@@ -258,7 +258,7 @@ const TOOLBAR_SELECTOR =
  */
 function findToolbarAnchor(): Element | null {
   const usable = Array.from(document.querySelectorAll(TOOLBAR_SELECTOR)).filter(isLiveAnchor);
-  return usable[usable.length - 1] ?? null;
+  return usable.at(-1) ?? null;
 }
 
 /** A toolbar is usable if it's laid out and not inside a hidden/inert dialog. */
