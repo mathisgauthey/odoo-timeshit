@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * Dev-only stand-in for the parts of the `chrome.*` extension API the app uses.
  *
  * When running under `ng serve` there is no extension runtime, so
@@ -181,6 +181,22 @@ function buildRuntime() {
 }
 
 /**
+ * Dev stand-in for `chrome.cookies`. There is no real cookie jar under
+ * `ng serve`, so cookie login can't be exercised end-to-end; this lets the code
+ * path run without throwing and lets a dev fake a session by setting
+ * `localStorage['__chrome_cookie__:session_id'] = '<value>'`.
+ */
+function buildCookies() {
+  return {
+    // chrome.cookies.get({ url, name }, callback)
+    get(details: { url: string; name: string }, callback: (cookie: any) => void): void {
+      const value = localStorage.getItem(`__chrome_cookie__:${details.name}`);
+      callback(value === null ? null : {name: details.name, value});
+    },
+  };
+}
+
+/**
  * Installs the shim when no real extension API is present.
  * Safe to call unconditionally, it no-ops inside a real extension.
  */
@@ -192,6 +208,7 @@ export function installChromeShimIfNeeded(): void {
     ...(g.chrome ?? {}),
     storage: buildLocalStorageArea(),
     runtime: buildRuntime(),
+    cookies: buildCookies(),
   };
 
   console.info('[chrome-shim] Using localStorage-backed chrome.* shim (dev mode).');

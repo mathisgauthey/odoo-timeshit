@@ -4,7 +4,10 @@
   "version": "1.0.0",
   "description": "Track timesheets in Odoo directly from your browser. Includes Azure DevOps timer integration.",
   "permissions": [
-    "storage"
+    "storage",
+    // Cookie login reads the Odoo `session_id` cookie to detect an existing
+    // browser session; paired with the `<all_urls>` host permission below.
+    "cookies"
     // TODO: Remove these apparently ?
     //    "activeTab",
     //    "webNavigation",

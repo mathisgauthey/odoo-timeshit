@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal} from '@angular/core';
 import {CardModule} from "primeng/card";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputTextModule} from "primeng/inputtext";
@@ -7,7 +7,7 @@ import {Button} from "primeng/button";
 import {PasswordModule} from "primeng/password";
 import {SelectButtonModule} from "primeng/selectbutton";
 import {Subscription} from 'rxjs';
-import {debounceTime} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {NgIf} from "@angular/common";
 import {MessageService} from "primeng/api";
 import {AuthService} from "../_services/auth.service";
@@ -42,7 +42,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   ];
   protected readonly APP_VERSION = APP_VERSION;
   protected readonly LoginMode = LoginMode;
-  private sub?: Subscription;
+  /** True once a live Odoo `session_id` cookie is found for the typed base URL. */
+  readonly cookieDetected = signal(false);
+  private readonly subs: Subscription[] = [];
 
   constructor(private readonly fb: FormBuilder, private readonly auth: AuthService, private readonly messages: MessageService, private readonly storage: StorageService) {
     this.form = this.fb.group({
@@ -61,12 +63,19 @@ export class LoginComponent implements OnInit, OnDestroy {
    * @return {void} No return value.
    */
   ngOnInit(): void {
-    this.sub = this.form.valueChanges.pipe(debounceTime(200)).subscribe(value => {
+    this.subs.push(this.form.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.storage.set(LOGIN_FORM_DRAFT_KEY, value);
-    });
+    }));
+
+    // Probe for an existing Odoo session cookie whenever the base URL settles,
+    // so the cookie login tab can advertise itself as available.
+    const baseUrl = this.form.get('odooBaseUrl')!;
+    this.subs.push(baseUrl.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(url => this.refreshCookieDetection(url)));
 
     this.storage.get<typeof this.form.value>(LOGIN_FORM_DRAFT_KEY).then(draft => {
       if (draft) this.form.patchValue(draft);
+      this.refreshCookieDetection(this.form.get('odooBaseUrl')?.value);
     });
   }
 
@@ -84,7 +93,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this.auth.verifyAndSaveCredentials(this.form.value);
+      await this.auth.verifyAndSaveCredentials({...this.form.value, loginMode: LoginMode.API});
     } catch (err: any) {
       this.messages.add({
         severity: 'error',
@@ -95,23 +104,37 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Attempts to establish a connection using a cookie-based authentication method.
-   * If the base URL is not provided, marks the corresponding form field as touched.
-   * Displays a warning message indicating that cookie login is not yet supported and
-   * advises using API login as an alternative.
+   * Establishes a connection using the browser's Odoo session cookie. Verifies
+   * that the session is still valid (by fetching the user context through the
+   * cookie transport) before persisting the credentials. Requires a base URL
+   * and a detected session cookie; otherwise it nudges the user accordingly.
    *
-   * @return {void} Does not return any value.
+   * @return {Promise<void>} A Promise that resolves when the connection process completes.
    */
-  connectWithCookie(): void {
-    const baseUrl = this.form.get('odooBaseUrl')?.value;
-    if (!baseUrl) {
+  async connectWithCookie(): Promise<void> {
+    const odooBaseUrl = this.form.get('odooBaseUrl')?.value?.trim();
+    if (!odooBaseUrl) {
       this.form.get('odooBaseUrl')?.markAsTouched();
+      return;
     }
-    this.messages.add({
-      severity: 'warn',
-      summary: 'Cookie Login Not (Yet) Supported',
-      detail: 'Cookie login is not yet supported. Please use the API login instead.'
-    })
+    if (!this.cookieDetected()) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'No Odoo Session Found',
+        detail: 'Log into Odoo in another tab for this URL, then try again.'
+      });
+      return;
+    }
+
+    try {
+      await this.auth.verifyAndSaveCredentials({odooBaseUrl, loginMode: LoginMode.Cookie});
+    } catch (err: any) {
+      this.messages.add({
+        severity: 'error',
+        summary: 'Login failed',
+        detail: String(err?.message ?? err)
+      });
+    }
   }
 
   /**
@@ -121,6 +144,20 @@ export class LoginComponent implements OnInit, OnDestroy {
    * @return {void} No return value.
    */
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.subs.forEach(s => s.unsubscribe());
+  }
+
+  /**
+   * Updates {@link cookieDetected} for the given base URL. Blank input short-
+   * circuits to `false` without touching `chrome.cookies`.
+   *
+   * @param baseUrl - The base URL currently entered on the form.
+   */
+  private async refreshCookieDetection(baseUrl: string | null | undefined): Promise<void> {
+    if (!baseUrl?.trim()) {
+      this.cookieDetected.set(false);
+      return;
+    }
+    this.cookieDetected.set(await this.auth.hasSessionCookie(baseUrl));
   }
 }

@@ -159,7 +159,7 @@ function writeTimerState(state: TimerState | null): Promise<void> {
 async function getApi(): Promise<OdooJson2Api> {
   const creds = await getStorage<OdooCredentials>(CREDENTIALS_KEY);
   if (!creds) throw new Error('Not authenticated: log in through the extension popup first.');
-  return new OdooJson2Api(creds.odooBaseUrl, creds.apiKey);
+  return new OdooJson2Api(creds.odooBaseUrl, creds.loginMode, creds.apiKey);
 }
 
 /** Technical names of the configured custom fields, for Odoo `fields` lists. */
