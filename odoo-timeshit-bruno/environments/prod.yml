@@ -6,3 +6,9 @@ variables:
     name: API_KEY
   - secret: true
     name: HOST
+  - secret: true
+    name: DATABASE
+  - secret: true
+    name: LOGIN
+  - secret: true
+    name: PASSWORD

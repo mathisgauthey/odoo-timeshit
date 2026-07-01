@@ -1,0 +1,27 @@
+info:
+  name: get context
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/web/dataset/call_kw"
+  body:
+    type: json
+    data: |-
+      {
+              "jsonrpc": "2.0",
+              "method": "call",
+              "params": {
+                "model": "res.users",
+                "method": "context_get",
+                "args": [],
+                "kwargs": {}
+              }
+            }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
