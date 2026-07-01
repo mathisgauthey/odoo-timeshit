@@ -1,12 +1,13 @@
 {
   "name": "odoo-timeshit",
-  "version": "0.0.0",
+  "version": "1.6.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "release": "semantic-release"
   },
   "private": true,
   "dependencies": {
@@ -29,9 +30,17 @@
     "@angular-devkit/build-angular": "^17.3.17",
     "@angular/cli": "^17.3.17",
     "@angular/compiler-cli": "^17.3.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^12.0.2",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/chrome": "^0.1.43",
     "@types/jasmine": "~5.1.0",
     "autoprefixer": "^10.5.0",
+    "conventional-changelog-conventionalcommits": "^9.1.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -39,6 +48,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.15",
+    "semantic-release": "^25.0.3",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.4.2"
   }

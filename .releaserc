@@ -26,9 +26,15 @@
       }
     ],
     [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false
+      }
+    ],
+    [
       "@semantic-release/exec",
       {
-        "prepareCmd": "sed -i \"s|^export const APP_VERSION = .*|export const APP_VERSION = '${nextRelease.version}'|\" src/app/_constants/app-constants.ts && npm run build && (cd dist && zip -r \"../odoo-timeshit-${nextRelease.version}.zip\" odoo-timeshit)"
+        "prepareCmd": "sed -i \"s|\\\"version\\\": \\\"[^\\\"]*\\\"|\\\"version\\\": \\\"${nextRelease.version}\\\"|\" src/manifest.json && npm run build && (cd dist && zip -r \"../odoo-timeshit-${nextRelease.version}.zip\" odoo-timeshit)"
       }
     ],
     [
@@ -36,7 +42,9 @@
       {
         "assets": [
           "docs/CHANGELOG.md",
-          "src/app/_constants/app-constants.ts"
+          "package.json",
+          "package-lock.json",
+          "src/manifest.json"
         ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
