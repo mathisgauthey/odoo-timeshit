@@ -193,11 +193,11 @@ async function onStart(): Promise<void> {
       const match = await send<{ id: number } | null>({action: 'azure:findEntry', workItemId});
       lineId = match?.id ?? null;
     }
-    if (lineId != null) {
-      running = await send<TimerState | null>({action: 'azure:startTimer', lineId});
-    } else {
+    if (lineId == null) {
       // No existing entry: hand off to the popup, pre-filled, to create one.
       await send({action: 'azure:openEditor', prefill: await buildPrefill()});
+    } else {
+      running = await send<TimerState | null>({action: 'azure:startTimer', lineId});
     }
     statusText = '';
   } catch (err: any) {
