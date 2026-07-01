@@ -14,7 +14,7 @@ import {
 } from "../../_constants/odoo-methods";
 import {HELPDESK_MODEL, PROJECT_MODEL, TASK_MODEL, TIMESHEET_MODEL, USER_MODEL} from "../../_constants/odoo-models";
 import {TimesheetEntry} from "../../_models/odoo/timesheet-entry.model";
-import {RUNNING_TIMER_FIELDS, TIMESHEET_FIELDS} from "../../_constants/odoo-query-fields";
+import {CALL_KW_POSITIONAL, RUNNING_TIMER_FIELDS, TIMESHEET_FIELDS} from "../../_constants/odoo-query-fields";
 import {LoginMode} from "../../_models/login-mode";
 
 export class OdooJson2Api {
@@ -391,12 +391,19 @@ export class OdooJson2Api {
    * `session_id` is `HttpOnly`, so it cannot be set as a header manually — the
    * request has to be same-cookie-jar rather than same-header.
    *
-   * The `/json/2` endpoint takes kwargs as its body, whereas `call_kw` splits
-   * into positional `args` and `kwargs`. Instance methods (`write`, `read`,
-   * `unlink`, the timer actions) receive their record ids as the first
-   * positional arg; model methods (`search_read`, `create`, `context_get`,
-   * `fields_get`) take none. Every caller passes ids under an `ids` key, so
-   * peeling it off reconstructs the positional/kwargs split faithfully.
+   * Callers everywhere speak the flat-kwargs dialect the `/json/2` REST endpoint
+   * wants (a single named-argument object). `call_kw` instead needs the classic
+   * positional-`args` + `kwargs` envelope, so we translate. There is no fully
+   * generic translation — mapping names to positional order needs per-method
+   * knowledge — but across our whole method surface `call_kw` needs exactly one
+   * leading positional argument, and it is always one of {@link CALL_KW_POSITIONAL}:
+   *  - `ids` for instance methods (`write`, `read`, `unlink`, the timer actions);
+   *  - `vals_list` for `create`, whose return-shape branch reads `args[0]`
+   *    (`result.id if isinstance(args[0], Mapping) else result.ids`) — passing it
+   *    as a kwarg leaves `args` empty and raises `IndexError: list index out of
+   *    range` *after* the record is created.
+   * Model methods that take neither (`search_read`, `context_get`, `fields_get`)
+   * pass an empty `args`. Everything not consumed as the positional arg is kwargs.
    *
    * Unlike REST, JSON-RPC answers business errors with HTTP 200 and an `error`
    * member, so that is unwrapped explicitly.
@@ -404,9 +411,12 @@ export class OdooJson2Api {
   private async callViaCookie(model: string, method: string, args: any): Promise<any> {
     const url = `${this.baseUrl.replace(/\/+$/, '')}/web/dataset/call_kw`;
 
-    const {ids, ...kwargs} = args ?? {};
-    const params = {model, method, args: ids !== undefined ? [ids] : [], kwargs};
-    const body = JSON.stringify({jsonrpc: '2.0', method: 'call', params});
+    const kwargs = {...(args ?? {})};
+    const positionalKey = CALL_KW_POSITIONAL.find(key => kwargs[key] !== undefined);
+    const positional = positionalKey ? [kwargs[positionalKey]] : [];
+    if (positionalKey) delete kwargs[positionalKey];
+    const params = {model, method, args: positional, kwargs};
+    const body = JSON.stringify({jsonrpc: '2.0', method: 'call_kw', params});
 
     let response: Response;
     try {
