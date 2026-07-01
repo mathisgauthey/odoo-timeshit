@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.5.0...1.6.0) (2026-07-01)
+
+### Features
+
+* **styles:** 🎨 Add dark mode support for PrimeNG themes via `prefers-color-scheme` ([a9ef0c1](https://github.com/mathisgauthey/odoo-timeshit/commit/a9ef0c137692430655aea947134f10c569558b21))
+
 ## [1.5.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.4.0...1.5.0) (2026-07-01)
 
 ### Features
