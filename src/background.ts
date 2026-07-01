@@ -162,8 +162,10 @@ async function timerAction(
 async function openEditor(prefill: AzurePrefill): Promise<void> {
   await setStorage(AZURE_PREFILL_KEY, prefill);
   const url = chrome.runtime.getURL('index.html');
+  // Rough size; the app corrects the outer bounds to fit the 800×600 content
+  // exactly and centers the window once it knows its own title-bar height.
   await new Promise<void>(resolve => {
-    chrome.windows.create({url, type: 'popup', width: 800, height: 900}, () => resolve());
+    chrome.windows.create({url, type: 'popup', width: 800, height: 600}, () => resolve());
   });
 }
 

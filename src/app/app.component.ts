@@ -39,6 +39,8 @@ export class AppComponent {
   readonly loggedIn = this.auth.loggedIn;
   private readonly odoo = inject(OdooService);
   private readonly storage = inject(StorageService);
+  /** True when this app is the standalone window opened from an Azure work item. */
+  private isAzureWindow = false;
 
   constructor() {
     // Once logged in, pick up any timer that's already running server-side.
@@ -92,9 +94,15 @@ export class AppComponent {
 
   /** Timer started from the editor: clear the Azure pre-fill and show the timer. */
   onTimerStarted(): void {
+    if (this.closeIfAzureWindow()) return;
     this.editingEntry.set(null);
     this.azurePrefill.set(null);
     this.setTab(Tab.Timer);
+  }
+
+  /** New entry saved from the editor: close the Azure window, if that's what this is. */
+  onSaved(): void {
+    this.closeIfAzureWindow();
   }
 
   logout(): void {
@@ -106,8 +114,35 @@ export class AppComponent {
     const prefill = await this.storage.get<AzurePrefill>(AZURE_PREFILL_KEY);
     if (!prefill) return;
     await this.storage.remove(AZURE_PREFILL_KEY);
+    this.isAzureWindow = true;
     this.editingEntry.set(null);
     this.azurePrefill.set(prefill);
     this.activeTab.set(Tab.AddOrEdit);
+    this.fitAndCenterWindow();
+  }
+
+  /**
+   * The Azure hand-off opens this app as a standalone popup window. Chrome sizes
+   * that window's *outer* bounds, so the fixed 800×600 content (see styles.css)
+   * ends up clipped by the title bar. Correct the outer bounds so the content is
+   * exactly 800×600, then center the window on the screen.
+   */
+  private fitAndCenterWindow(): void {
+    const chrome = (globalThis as any).chrome;
+    if (!chrome?.windows) return;
+    const width = 800 + (window.outerWidth - window.innerWidth);
+    const height = 600 + (window.outerHeight - window.innerHeight);
+    const left = Math.max(0, Math.round((screen.availWidth - width) / 2));
+    const top = Math.max(0, Math.round((screen.availHeight - height) / 2));
+    chrome.windows.getCurrent((win: any) => {
+      if (win?.id != null) chrome.windows.update(win.id, {width, height, left, top});
+    });
+  }
+
+  /** Closes the standalone Azure editor window; returns true when it was one. */
+  private closeIfAzureWindow(): boolean {
+    if (!this.isAzureWindow) return false;
+    window.close();
+    return true;
   }
 }

@@ -81,6 +81,8 @@ export class AddOrEditTimesheetComponent implements OnInit {
   editingId: number | null = null;
   /** Emitted once a timer has started, so the host can switch to the timer tab. */
   readonly timerStarted = output<void>();
+  /** Emitted once a new entry is successfully created, so the host can react (e.g. close the Azure window). */
+  readonly saved = output<void>();
   /** Emitted when an edit finishes (saved or cancelled), so the host can leave the editor. */
   readonly closed = output<void>();
   private odoo = inject(OdooService);
@@ -208,6 +210,7 @@ export class AddOrEditTimesheetComponent implements OnInit {
         await this.odoo.createTimesheet(values);
         this.messages.add({severity: 'success', summary: 'Entry saved'});
         this.reset();
+        this.saved.emit();
       }
     } catch {
       // Request failures are toasted centrally by ErrorService.
