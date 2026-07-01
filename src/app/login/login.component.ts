@@ -12,7 +12,7 @@ import {NgIf} from "@angular/common";
 import {MessageService} from "primeng/api";
 import {AuthService} from "../_services/auth.service";
 import {StorageService} from "../_services/storage.service";
-import {APP_VERSION} from "../_constants/app-constants";
+import {APP_VERSION, DOC_URL} from "../_constants/app-constants";
 import {LOGIN_FORM_DRAFT_KEY} from "../_constants/storage-keys";
 import {LoginMode} from "../_models/login-mode";
 
@@ -41,6 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     {label: 'Cookie Login', value: LoginMode.Cookie}
   ];
   protected readonly APP_VERSION = APP_VERSION;
+  protected readonly DOC_URL = DOC_URL;
   protected readonly LoginMode = LoginMode;
   /** True once a live Odoo `session_id` cookie is found for the typed base URL. */
   readonly cookieDetected = signal(false);

@@ -34,6 +34,11 @@
         }
 
         <div class="flex items-center">
+          <button (click)="debugDialog.open()"
+                  class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors"
+                  title="Debug info">
+            <i class="pi pi-info-circle"></i>
+          </button>
           <button (click)="settingsOpen.set(true)"
                   class="p-2 rounded-lg text-[var(--text-color-secondary)] hover:bg-[var(--surface-100)] transition-colors"
                   title="Custom fields">
@@ -90,6 +95,8 @@
           <span class="text-[11px]">Timer</span>
         </button>
       </nav>
+
+      <app-debug-info #debugDialog/>
     </div>
   }
 } @else {

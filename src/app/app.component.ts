@@ -16,11 +16,12 @@ import {APP_TITLE} from "./_constants/app-constants";
 import {SettingsComponent} from "./_settings/settings/settings.component";
 
 import {AzurePrefill} from "./_models/azure/azure-prefill.model";
+import {DebugInfoComponent} from "./debug/debug-info/debug-info.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [LoginComponent, WeeklyTimesheetComponent, AddOrEditTimesheetComponent, TimerComponent, SettingsComponent, ToastModule, ConfirmDialogModule, SettingsComponent],
+  imports: [LoginComponent, WeeklyTimesheetComponent, AddOrEditTimesheetComponent, TimerComponent, SettingsComponent, ToastModule, ConfirmDialogModule, DebugInfoComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

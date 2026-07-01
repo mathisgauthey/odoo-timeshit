@@ -1,0 +1,60 @@
+<p-dialog (visibleChange)="visible.set($event)"
+          [dismissableMask]="true"
+          [draggable]="false"
+          [modal]="true"
+          [resizable]="false"
+          [style]="{width: '26rem', maxWidth: '92vw'}"
+          [visible]="visible()"
+          appendTo="body"
+          header="Debug info">
+  <!-- Environment facts -->
+  <ul class="list-none m-0 p-0 flex flex-col gap-2">
+    @for (fact of facts; track fact.label) {
+      <li class="flex flex-col gap-0.5">
+        <span class="text-xs font-medium text-[var(--text-color-secondary)]">{{ fact.label }}</span>
+        <span class="text-sm text-[var(--text-color)] break-all">{{ fact.value }}</span>
+      </li>
+    }
+  </ul>
+
+  <!-- Copy action, set apart from the facts above. -->
+  <div class="mt-6 pt-5 border-t border-[var(--surface-border)]">
+    <p-button (onClick)="copyAsMarkdown()"
+              [outlined]="true"
+              icon="pi pi-copy"
+              label="Copy as markdown"
+              size="small"
+              styleClass="w-full justify-center"
+              type="button"/>
+  </div>
+
+  <!-- Links -->
+  <hr class="border-t border-[var(--surface-border)] my-4"/>
+  <nav class="flex flex-col gap-2">
+    <a [href]="docUrl"
+       class="flex items-center gap-2 text-sm text-[var(--primary-color)] hover:underline"
+       rel="noopener noreferrer"
+       target="_blank">
+      <i class="pi pi-book"></i>
+      <span>Documentation</span>
+    </a>
+    <!-- These pre-fill nothing on the server side, so we copy the debug info to
+         the clipboard first, then open the template for a quick paste. -->
+    <a (click)="copyAndOpen($event, bugReportUrl)"
+       [href]="bugReportUrl"
+       class="flex items-center gap-2 text-sm text-[var(--primary-color)] hover:underline cursor-pointer"
+       rel="noopener noreferrer"
+       target="_blank">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>Report a bug</span>
+    </a>
+    <a (click)="copyAndOpen($event, featureRequestUrl)"
+       [href]="featureRequestUrl"
+       class="flex items-center gap-2 text-sm text-[var(--primary-color)] hover:underline cursor-pointer"
+       rel="noopener noreferrer"
+       target="_blank">
+      <i class="pi pi-sparkles"></i>
+      <span>Request a feature</span>
+    </a>
+  </nav>
+</p-dialog>

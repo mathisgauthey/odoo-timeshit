@@ -111,8 +111,10 @@
 
     <!-- Footer -->
     <footer class="flex flex-col items-center gap-3 mt-6">
-      <a class="text-xs font-medium text-[var(--primary-color)] hover:underline"
-         href="#">Help &amp; Setup Guide
+      <a [href]="DOC_URL"
+         class="text-xs font-medium text-[var(--primary-color)] hover:underline"
+         rel="noopener noreferrer"
+         target="_blank">Help &amp; Setup Guide
       </a>
       <div class="flex items-center gap-2 opacity-40">
         <div class="h-px w-8 bg-[var(--surface-border)]"></div>
