@@ -3,7 +3,16 @@
 @import "tailwindcss/components" layer(tailwindcss);
 @import "tailwindcss/utilities" layer(tailwindcss);
 
-@import "primeng/resources/themes/aura-light-purple/theme.css";
+/*
+ * Theme follows the browser/OS colour scheme automatically. Each theme @import
+ * is qualified with a prefers-color-scheme media query, so postcss-import wraps
+ * the theme's :root variables in the matching @media block at build time and
+ * only one variable set is ever active. No JS toggle, no flash on open.
+ * Everything downstream (app chrome, Azure settings popup, day-balance confirm
+ * dialog) reads these PrimeNG variables, so it all switches for free.
+ */
+@import "primeng/resources/themes/aura-light-purple/theme.css" screen and (prefers-color-scheme: light);
+@import "primeng/resources/themes/aura-dark-purple/theme.css" screen and (prefers-color-scheme: dark);
 @import "primeng/resources/primeng.css";
 @import "primeicons/primeicons.css";
 
@@ -15,6 +24,10 @@ html, body, app-root {
   width: 800px;
   height: 600px;
   overflow: hidden;
+  /* Themed backdrop so the popup chrome (behind the login screen and around
+     content) tracks the active scheme instead of flashing white in dark mode. */
+  background: var(--surface-ground);
+  color: var(--text-color);
 }
 
 /*
