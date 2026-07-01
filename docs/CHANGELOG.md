@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.3.0...1.4.0) (2026-07-01)
+
+### Features
+
+* **timer:** 🎨 Improve button icons and styling for timer actions ([874f38f](https://github.com/mathisgauthey/odoo-timeshit/commit/874f38fd367d2d0acf0c87bfa6a76f65243aa958))
+
 ## [1.3.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.2.1...1.3.0) (2026-07-01)
 
 ### Features
