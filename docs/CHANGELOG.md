@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.2.1...1.3.0) (2026-07-01)
+
+### Features
+
+* **timer:** ⏱️ Synchronize badge colors and icons with timer state ([dd97a30](https://github.com/mathisgauthey/odoo-timeshit/commit/dd97a30a59b6e021af9c77c14fc43d4aeaab0a0d)), closes [#17](https://github.com/mathisgauthey/odoo-timeshit/issues/17)
+
 ## [1.2.1](https://github.com/mathisgauthey/odoo-timeshit/compare/1.2.0...1.2.1) (2026-07-01)
 
 ### Bug Fixes
