@@ -1,0 +1,26 @@
+info:
+  name: web authenticate
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/web/session/authenticate"
+  body:
+    type: json
+    data: |-
+      {
+        "jsonrpc": "2.0",
+        "method": "call",
+        "params": {
+          "db": "{{DATABASE}}",
+          "login": "{{LOGIN}}",
+          "password": "{{PASSWORD}}"
+        }
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
