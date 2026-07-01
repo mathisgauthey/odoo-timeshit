@@ -15,19 +15,24 @@ import {
 import {HELPDESK_MODEL, PROJECT_MODEL, TASK_MODEL, TIMESHEET_MODEL, USER_MODEL} from "../../_constants/odoo-models";
 import {TimesheetEntry} from "../../_models/odoo/timesheet-entry.model";
 import {RUNNING_TIMER_FIELDS, TIMESHEET_FIELDS} from "../../_constants/odoo-query-fields";
+import {LoginMode} from "../../_models/login-mode";
 
 export class OdooJson2Api {
   /**
    * @param baseUrl - The base URL of the Odoo server.
-   * @param apiKey - The API key for authentication.
-   * @param database - Optional database name to connect to.
+   * @param loginMode - Whether requests authenticate with an API key or the
+   *   browser session cookie. This is the only switch that changes the transport:
+   *   see {@link call}.
+   * @param apiKey - The API key for authentication. Required for
+   *   {@link LoginMode.API}; ignored for {@link LoginMode.Cookie}.
    * @param onError - Invoked with every {@link OdooHttpError} before it is thrown,
    *   so a central handler can toast / log out. The error still propagates to the
    *   caller for control flow.
    */
   constructor(
     private readonly baseUrl: string,
-    private readonly apiKey: string,
+    private readonly loginMode: LoginMode,
+    private readonly apiKey: string = '',
     private readonly onError?: (error: OdooHttpError) => void,
   ) {
   }
@@ -326,17 +331,32 @@ export class OdooJson2Api {
   }
 
   /**
-   * Executes a remote method call to the specified model and method using Odoo's JSON-RPC API.
+   * Executes a remote method call and dispatches to the transport for the
+   * active {@link LoginMode}. This is the single place the two auth strategies
+   * diverge: API-key logins hit the token-authenticated `/json/2` endpoint,
+   * cookie logins hit the classic `/web/dataset/call_kw` JSON-RPC endpoint and
+   * ride the browser's `session_id` cookie.
    *
    * @param model - The name of the Odoo model to interact with.
    * @param method - The name of the method to invoke on the model.
    * @param args - The arguments to pass to the method. Defaults to an empty object.
    *
-   * @returns The response from the server parsed as JSON.
+   * @returns The method result parsed as JSON.
    *
    * @throws {@link OdooHttpError} If a network error occurs or the server response indicates an error.
    */
-  private async call(model: string, method: string, args: any = {}): Promise<any> {
+  private call(model: string, method: string, args: any = {}): Promise<any> {
+    return this.loginMode === LoginMode.Cookie
+      ? this.callViaCookie(model, method, args)
+      : this.callViaApiKey(model, method, args);
+  }
+
+  /**
+   * API-key transport: posts the kwargs directly to the `/json/2` REST endpoint
+   * and authenticates with a `Bearer` token. The endpoint returns the method
+   * result as the response body.
+   */
+  private async callViaApiKey(model: string, method: string, args: any): Promise<any> {
     const url = `${this.baseUrl.replace(/\/+$/, '')}/json/2/${model}/${method}`;
 
     const headers: Record<string, string> = {
@@ -362,6 +382,60 @@ export class OdooJson2Api {
     }
 
     return response.json();
+  }
+
+  /**
+   * Cookie transport: wraps the call in the classic `/web/dataset/call_kw`
+   * JSON-RPC envelope and lets the browser attach the `session_id` cookie
+   * (`credentials: 'include'`, permitted by the extension's host permissions).
+   * `session_id` is `HttpOnly`, so it cannot be set as a header manually — the
+   * request has to be same-cookie-jar rather than same-header.
+   *
+   * The `/json/2` endpoint takes kwargs as its body, whereas `call_kw` splits
+   * into positional `args` and `kwargs`. Instance methods (`write`, `read`,
+   * `unlink`, the timer actions) receive their record ids as the first
+   * positional arg; model methods (`search_read`, `create`, `context_get`,
+   * `fields_get`) take none. Every caller passes ids under an `ids` key, so
+   * peeling it off reconstructs the positional/kwargs split faithfully.
+   *
+   * Unlike REST, JSON-RPC answers business errors with HTTP 200 and an `error`
+   * member, so that is unwrapped explicitly.
+   */
+  private async callViaCookie(model: string, method: string, args: any): Promise<any> {
+    const url = `${this.baseUrl.replace(/\/+$/, '')}/web/dataset/call_kw`;
+
+    const {ids, ...kwargs} = args ?? {};
+    const params = {model, method, args: ids !== undefined ? [ids] : [], kwargs};
+    const body = JSON.stringify({jsonrpc: '2.0', method: 'call', params});
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json; charset=utf-8'},
+        body,
+        credentials: 'include',
+      });
+    } catch {
+      throw this.fail(new OdooHttpError(0, 'Network error'));
+    }
+
+    if (!response.ok) {
+      let errorBody: unknown;
+      try {
+        errorBody = await response.json();
+      } catch {
+        // No (or non-JSON) error body; that's fine.
+      }
+      throw this.fail(new OdooHttpError(response.status, response.statusText, errorBody));
+    }
+
+    const payload = await response.json();
+    if (payload?.error) {
+      const {code, message, data} = payload.error;
+      throw this.fail(new OdooHttpError(code ?? 200, message ?? 'Odoo error', data ?? payload.error));
+    }
+    return payload?.result;
   }
 
   /**

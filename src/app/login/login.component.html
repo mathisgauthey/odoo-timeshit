@@ -22,7 +22,19 @@
         [options]="loginModes"
         optionLabel="label"
         optionValue="value"
-        styleClass="w-full"/>
+        styleClass="w-full">
+        <ng-template let-item
+                     pTemplate>
+          <!-- `relative` keeps the content above the white selection pill the
+               aura theme paints via `.p-highlight::before`; PrimeNG's default
+               `.p-button-label` does this, but a custom template must opt in. -->
+          <span class="relative">{{ item.label }}</span>
+          <!-- Lights up once a session cookie is found for the typed URL. -->
+          <i *ngIf="item.value === LoginMode.Cookie && cookieDetected()"
+             class="pi pi-check-circle text-[var(--green-500)] ml-2 relative"
+             title="Odoo session detected"></i>
+        </ng-template>
+      </p-selectButton>
     </div>
 
     <!-- API login form -->
@@ -59,13 +71,6 @@
     <div *ngIf="loginMode === LoginMode.Cookie"
          [formGroup]="form"
          class="flex flex-col gap-5">
-      <div class="flex items-start gap-3 p-4 rounded-xl bg-[var(--yellow-50)] border border-[var(--yellow-200)]">
-        <i class="pi pi-exclamation-triangle text-[var(--yellow-600)] mt-0.5"></i>
-        <p class="text-sm text-[var(--text-color-secondary)] m-0">
-          This method is not implemented yet and is coming soon.
-        </p>
-      </div>
-
       <div class="flex items-start gap-3 p-4 mb-5 rounded-xl bg-[var(--surface-100)] border border-[var(--surface-border)]">
         <i class="pi pi-info-circle text-[var(--primary-color)] mt-0.5"></i>
         <p class="text-sm text-[var(--text-color-secondary)] m-0">
@@ -74,15 +79,29 @@
       </div>
 
       <p-floatLabel>
-        <input [disabled]="true"
-               class="w-full"
+        <input class="w-full"
+               formControlName="odooBaseUrl"
                id="cookieBaseUrl"
                pInputText
                type="text"/>
         <label for="cookieBaseUrl">Base URL</label>
       </p-floatLabel>
 
+      <!-- Live detection status for the typed URL. -->
+      <div *ngIf="cookieDetected(); else noCookie"
+           class="flex items-center gap-2 text-sm text-[var(--green-600)]">
+        <i class="pi pi-check-circle"></i>
+        <span>Odoo session found — you can log in with your cookie.</span>
+      </div>
+      <ng-template #noCookie>
+        <div class="flex items-center gap-2 text-sm text-[var(--text-color-secondary)]">
+          <i class="pi pi-times-circle"></i>
+          <span>No Odoo session found for this URL.</span>
+        </div>
+      </ng-template>
+
       <p-button (onClick)="connectWithCookie()"
+                [disabled]="!cookieDetected()"
                 [outlined]="true"
                 icon="pi pi-bookmark"
                 label="Use browser cookie"

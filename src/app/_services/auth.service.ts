@@ -3,6 +3,7 @@ import {CREDENTIALS_KEY} from "../_constants/storage-keys";
 import {OdooCredentials} from "../_models/odoo/odoo-credentials.credentials";
 import {StorageService} from "./storage.service";
 import {OdooService} from "./odoo/odoo.service";
+import {getSessionCookie} from "../_helpers/cookies";
 
 /**
  * Tracks whether the user is authenticated and owns the verify/store/clear flow.
@@ -51,6 +52,18 @@ export class AuthService {
     const context = await this.odoo.verifyCredentials(creds);
     await this.setCredentials(creds);
     return context;
+  }
+
+  /**
+   * Checks whether the browser already holds an Odoo `session_id` cookie for the
+   * given base URL, i.e. whether cookie login is available for it. Drives the
+   * login form's "cookie detected" affordance.
+   *
+   * @param baseUrl - The Odoo base URL to probe.
+   * @returns `true` when a session cookie is present.
+   */
+  async hasSessionCookie(baseUrl: string): Promise<boolean> {
+    return !!(await getSessionCookie(baseUrl));
   }
 
   /**

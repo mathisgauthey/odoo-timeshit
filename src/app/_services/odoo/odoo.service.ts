@@ -42,7 +42,7 @@ export class OdooService {
    * @returns A promise that resolves with the user context from Odoo.
    */
   async verifyCredentials(creds: OdooCredentials): Promise<any> {
-    const api = new OdooJson2Api(creds.odooBaseUrl, creds.apiKey, e => this.errors.handle(e));
+    const api = new OdooJson2Api(creds.odooBaseUrl, creds.loginMode, creds.apiKey, e => this.errors.handle(e));
     return api.getContext();
   }
 
@@ -239,7 +239,7 @@ export class OdooService {
     const creds = await this.storage.get<OdooCredentials>(CREDENTIALS_KEY);
     if (!creds) throw new Error('Not authenticated');
     // Route every request's failures through the central handler
-    return new OdooJson2Api(creds.odooBaseUrl, creds.apiKey, e => this.errors.handle(e));
+    return new OdooJson2Api(creds.odooBaseUrl, creds.loginMode, creds.apiKey, e => this.errors.handle(e));
   }
 }
 
