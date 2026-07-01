@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.1.0...1.2.0) (2026-07-01)
+
+### Features
+
+* **login:** ✨ Add cookie-based login functionality ([11a33fe](https://github.com/mathisgauthey/odoo-timeshit/commit/11a33feefe84c30a4ade7f6bea5de041571fdd4c))
+
 ## [1.1.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.0.2...1.1.0) (2026-06-30)
 
 ### Features
