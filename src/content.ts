@@ -87,12 +87,20 @@ function syncWithPage(): void {
 
 /** The work item id from the page URL, or '' when this isn't a work-item page. */
 function parseWorkItemId(): string {
+  const fromForm = readFormId(findActiveForm());
+  if (fromForm) return fromForm;
   const fromPath = /_workitems\/(?:edit\/)?(\d+)/.exec(location.pathname);
   if (fromPath) return fromPath[1];
   const fromQuery = new URLSearchParams(location.search).get('workitem');
   return fromQuery && /^\d+$/.test(fromQuery) ? fromQuery : '';
 }
 
+const FORM_ID_SELECTOR = '.work-item-form-id, [aria-label="ID Field"]';
+
+function readFormId(form: Element | null): string {
+  const raw = form?.querySelector(FORM_ID_SELECTOR)?.textContent ?? '';
+  return raw.replace(/\D+/g, '');
+}
 /** Reads a configured mapping source from the page: `@id`, `@title`, or a field label. */
 function scrapeSource(source: string): string {
   const token = source.trim();
@@ -259,6 +267,16 @@ const TOOLBAR_SELECTOR =
 function findToolbarAnchor(): Element | null {
   const usable = Array.from(document.querySelectorAll(TOOLBAR_SELECTOR)).filter(isLiveAnchor);
   return usable.at(-1) ?? null;
+}
+
+/**
+ * The work-item form we're anchored in: the ancestor form of the active
+ * toolbar. This is the single source of truth for *which* work item the widget
+ * acts on, so id reading and field scraping stay in lock-step with where the
+ * Start button is rendered, even when dialogs are stacked.
+ */
+function findActiveForm(): Element | null {
+  return findToolbarAnchor()?.closest('.work-item-form') ?? null;
 }
 
 /** A toolbar is usable if it's laid out and not inside a hidden/inert dialog. */
