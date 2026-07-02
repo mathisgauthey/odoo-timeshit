@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/mathisgauthey/odoo-timeshit/compare/1.7.0...1.7.1) (2026-07-02)
+
+### Bug Fixes
+
+* **content:** 🐛 Enhance work item ID parsing with form-based detection ([e46b451](https://github.com/mathisgauthey/odoo-timeshit/commit/e46b451457188d8fb996c118ae8342a3149cd695)), closes [#30](https://github.com/mathisgauthey/odoo-timeshit/issues/30)
+
 ## [1.7.0](https://github.com/mathisgauthey/odoo-timeshit/compare/1.6.0...1.7.0) (2026-07-01)
 
 ### Features
